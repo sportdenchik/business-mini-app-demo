@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Business Mini App V3</title>
+<style>
+:root{--bg:#0b0d10;--card:#15181d;--card2:#1d2229;--text:#f5f6f8;--muted:#949ba6;--a:#d9b75d;--line:#2b3038;--danger:#d96a6a}
+*{box-sizing:border-box}body{margin:0;background:#050607;color:var(--text);font:15px Arial,sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer}.app{max-width:520px;margin:auto;min-height:100vh;background:var(--bg);padding-bottom:90px}
+header{position:sticky;top:0;z-index:10;padding:15px 16px;background:#0b0d10ed;backdrop-filter:blur(14px);border-bottom:1px solid #ffffff08}
+.head{display:flex;justify-content:space-between;align-items:center}.brand{font-weight:800;letter-spacing:.04em}.gear{border:0;background:none;color:var(--muted);font-size:22px}
+.screen{display:none}.screen.active{display:block}.hero{padding:25px 16px 10px}.ey{color:var(--a);font-size:11px;font-weight:800;letter-spacing:.17em}.hero h1{font-size:31px;line-height:1.06;margin:10px 0}.lead,p{color:var(--muted);line-height:1.5}
+.tabs{display:flex;gap:9px;overflow:auto;padding:16px}.tab{border:1px solid var(--line);background:var(--card);color:#ddd;border-radius:99px;padding:10px 15px;white-space:nowrap}.tab.active{background:var(--a);color:#18140b}
+.section{padding:6px 16px}.title{display:flex;justify-content:space-between;align-items:end;margin:10px 0 12px}.title h2{margin:0;font-size:21px}.title span{color:var(--muted);font-size:12px}
+.card,.tile,.row,.news{background:var(--card);border:1px solid var(--line);border-radius:19px}.card{overflow:hidden;margin-bottom:12px}.cover{height:160px;background:linear-gradient(135deg,#28343d,#705a37);position:relative}.house{position:absolute;left:14%;right:14%;bottom:24px;height:68px;background:linear-gradient(145deg,#ddd,#74777b);border-radius:7px}.house:before{content:"";position:absolute;left:-12px;top:-38px;border-left:145px solid transparent;border-right:145px solid transparent;border-bottom:53px solid #3c4043;transform:scaleX(.82)}
+.body{padding:15px}.tag{color:var(--a);font-size:10px;font-weight:800;text-transform:uppercase}.body h3{margin:6px 0}.body p{margin:0;font-size:14px}.meta{display:flex;justify-content:space-between;align-items:center;margin-top:13px}.round{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--card2);color:white}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tile{padding:16px;text-align:left;color:white;min-height:112px}.ico{font-size:24px;margin-bottom:12px}.tile b,.row b{display:block;margin-bottom:5px}.tile span,.row span{font-size:12px;color:var(--muted)}
+.bottom{position:fixed;z-index:20;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,520px);display:grid;grid-template-columns:repeat(4,1fr);background:#101216f5;border-top:1px solid var(--line);padding:7px}.nav{border:0;background:none;color:#8f96a0;font-size:11px}.nav strong{display:block;font-size:20px}.nav.active{color:var(--a)}
+.detail{padding:20px 16px}.detail h2{font-size:29px;margin:0}.list{display:grid;gap:10px;margin-top:16px}.row{padding:16px;text-align:left;color:white}
+.primary,.secondary,.danger{width:100%;padding:14px;border-radius:14px;font-weight:800;margin-top:11px}.primary{border:0;background:var(--a);color:#18140b}.secondary{border:1px solid var(--line);background:var(--card2);color:white}.danger{border:1px solid #633333;background:#321c1c;color:#f3a2a2}
+.news{padding:15px;margin-top:10px}.news b{display:block;margin-bottom:5px}.news small{color:var(--muted)}
+.admin-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.admin-badge{font-size:11px;padding:7px 9px;border-radius:99px;background:#213421;color:#9ddd9d}.admin-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:10px}.admin-card h3{margin:0 0 6px}.admin-card p{margin:0;font-size:13px}.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.stat div{background:var(--card2);border-radius:13px;padding:12px}.stat b{display:block;font-size:20px}.stat span{font-size:11px;color:var(--muted)}
+.modal{display:none;position:fixed;inset:0;z-index:40;background:#000b;align-items:end}.modal.open{display:flex}.sheet{width:min(100%,520px);background:#15181d;border:1px solid var(--line);border-radius:24px 24px 0 0;padding:20px 16px 28px;max-height:92vh;overflow:auto}.close{float:right;border:0;background:#292e35;color:#fff;width:34px;height:34px;border-radius:50%}.sheet h3{font-size:23px;margin:0 45px 10px 0}.sheet label{display:block;font-size:12px;color:var(--muted);margin-top:12px}input,textarea,select{width:100%;padding:13px;margin-top:6px;background:#0f1216;border:1px solid var(--line);color:#fff;border-radius:12px;outline:0}textarea{min-height:100px;resize:vertical}.toast{position:fixed;z-index:60;bottom:105px;left:50%;transform:translateX(-50%);background:var(--a);color:#18140b;padding:11px 15px;border-radius:12px;display:none}.toast.show{display:block}
+.admin-list{display:grid;gap:8px;margin-top:12px}.manage{display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:10px}.manage-main{flex:1;min-width:0}.manage-main b,.manage-main span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.manage-main span{font-size:11px;color:var(--muted);margin-top:3px}.mini{border:1px solid var(--line);background:#111419;color:#fff;border-radius:9px;padding:8px 10px}.mini.d{color:#f3a2a2}.hint{font-size:11px;color:var(--muted);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="head"><span class="brand" id="brand">БИЗНЕС APP</span><button class="gear" onclick="openAdmin()">⚙</button></div></header>
+
+<main id="home" class="screen active">
+<section class="hero"><div class="ey" id="ey">ВАШ БИЗНЕС В TELEGRAM</div><h1 id="heroTitle">Всё необходимое — в одном приложении</h1><p id="heroText">Услуги, новости, проекты, калькулятор и заявки.</p></section>
+<div class="tabs" id="tabs"></div>
+<section class="section"><div class="title"><h2>Новости</h2><span>Все</span></div><div id="news"></div></section>
+<section class="section"><div class="title"><h2>Услуги</h2><span>Каталог</span></div><div class="grid" id="services"></div></section>
+<section class="section"><div class="title"><h2>Популярное</h2><span>Проекты</span></div><div id="projects"></div></section>
+</main>
+
+<main id="catalog" class="screen"><section class="detail"><h2>Каталог</h2><p>Все услуги компании.</p><div class="list" id="catalogList"></div></section></main>
+<main id="chat" class="screen"><section class="detail"><h2>Связаться</h2><p>Напишите менеджеру или оставьте заявку.</p><button class="primary" onclick="telegramChat()">Написать менеджеру</button><button class="secondary" onclick="openLead()">Оставить заявку</button></section></main>
+<main id="profile" class="screen"><section class="detail"><h2>Профиль</h2><p id="profileText">Оставьте заявку — и ваши обращения можно будет хранить в истории.</p><button class="primary" onclick="openLead()">Оставить заявку</button></section></main>
+
+<nav class="bottom">
+<button class="nav active" onclick="show('home',this)"><strong>⌂</strong>Главная</button>
+<button class="nav" onclick="show('catalog',this)"><strong>▦</strong>Услуги</button>
+<button class="nav" onclick="show('chat',this)"><strong>□</strong>Чат</button>
+<button class="nav" onclick="show('profile',this)"><strong>○</strong>Профиль</button>
+</nav>
+</div>
+
+<div class="modal" id="adminModal"><div class="sheet">
+<button class="close" onclick="closeM('adminModal')">×</button>
+<div class="admin-top"><div><div class="ey">ПАНЕЛЬ УПРАВЛЕНИЯ</div><h3 style="margin-bottom:0">Админка клиента</h3></div><span class="admin-badge">V3</span></div>
+<p>Изменения сохраняются в браузере. На следующем этапе это хранилище подключим к серверной базе данных.</p>
+<div class="stat"><div><b id="newsCount">0</b><span>новостей</span></div><div><b id="serviceCount">0</b><span>услуг</span></div><div><b id="leadCount">0</b><span>заявок</span></div></div>
+
+<div class="admin-card"><h3>Новости</h3><p>Добавляйте, редактируйте и удаляйте новости и акции.</p><button class="primary" onclick="openNewsEditor()">+ Добавить новость</button><div class="admin-list" id="newsAdmin"></div></div>
+<div class="admin-card"><h3>Услуги</h3><p>Управление названием, описанием и иконкой услуги.</p><button class="secondary" onclick="openServiceEditor()">+ Добавить услугу</button><div class="admin-list" id="serviceAdmin"></div></div>
+<div class="admin-card"><h3>Заявки</h3><p>Все заявки, созданные пользователями этого браузера.</p><div class="admin-list" id="leadAdmin"></div></div>
+<div class="admin-card"><h3>Настройки приложения</h3><p>Меняйте название и текст главной страницы без редактирования кода.</p><button class="secondary" onclick="openSettings()">Настроить приложение</button></div>
+<div class="admin-card"><h3>Данные</h3><p>Резервное копирование содержимого V3.</p><button class="secondary" onclick="exportData()">Экспорт JSON</button><button class="secondary" onclick="document.getElementById('importFile').click()">Импорт JSON</button><input id="importFile" type="file" accept=".json" style="display:none" onchange="importData(event)"><div class="hint">Экспорт пригодится при переносе проекта на настоящий сервер.</div></div>
+</div></div>
+
+<div class="modal" id="newsModal"><div class="sheet">
+<button class="close" onclick="closeM('newsModal')">×</button><div class="ey">КОНТЕНТ</div><h3 id="newsEditorTitle">Новая новость</h3>
+<label>Заголовок</label><input id="newsTitle" placeholder="Например: Скидка 15% до конца месяца">
+<label>Текст</label><textarea id="newsText" placeholder="Короткое описание новости или акции"></textarea>
+<label>Тип</label><select id="newsType"><option>Новость</option><option>Акция</option><option>Объявление</option></select>
+<button class="primary" onclick="saveNews()">Сохранить</button>
+</div></div>
+
+<div class="modal" id="serviceModal"><div class="sheet">
+<button class="close" onclick="closeM('serviceModal')">×</button><div class="ey">КАТАЛОГ</div><h3 id="serviceEditorTitle">Новая услуга</h3>
+<label>Название</label><input id="serviceName" placeholder="Например: Ремонт оборудования">
+<label>Описание</label><textarea id="serviceDesc" placeholder="Описание услуги"></textarea>
+<label>Иконка</label><input id="serviceIcon" placeholder="Например: 🔧" maxlength="4">
+<button class="primary" onclick="saveService()">Сохранить</button>
+</div></div>
+
+<div class="modal" id="settingsModal"><div class="sheet">
+<button class="close" onclick="closeM('settingsModal')">×</button><div class="ey">НАСТРОЙКИ</div><h3>Приложение</h3>
+<label>Название</label><input id="setBrand">
+<label>Надпись над заголовком</label><input id="setEy">
+<label>Главный заголовок</label><input id="setHero">
+<label>Описание</label><textarea id="setHeroText"></textarea>
+<button class="primary" onclick="saveSettings()">Сохранить настройки</button>
+</div></div>
+
+<div class="modal" id="detailModal"><div class="sheet"><button class="close" onclick="closeM('detailModal')">×</button><h3 id="dt"></h3><p id="dd"></p><button class="primary" onclick="closeM('detailModal');openLead()">Оставить заявку</button></div></div>
+<div class="modal" id="leadModal"><div class="sheet"><button class="close" onclick="closeM('leadModal')">×</button><div class="ey">ЗАЯВКА</div><h3>Связаться с нами</h3><label>Имя</label><input id="leadName" placeholder="Ваше имя"><label>Контакт</label><input id="leadContact" placeholder="Телефон или @username"><label>Комментарий</label><textarea id="leadComment" placeholder="Что вас интересует?"></textarea><button class="primary" onclick="sendLead()">Отправить заявку</button></div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+const DEFAULT_DATA={
+ brand:"БИЗНЕС APP",
+ ey:"ВАШ БИЗНЕС В TELEGRAM",
+ hero:"Всё необходимое — в одном приложении",
+ heroText:"Услуги, новости, проекты, калькулятор и заявки.",
+ tabs:["Все","Услуги","Проекты","Акции"],
+ news:[
+  {id:"n1",title:"Добро пожаловать!",text:"Здесь клиент сможет видеть новости и акции компании.",type:"Новость"},
+  {id:"n2",title:"Специальное предложение",text:"Добавьте сюда свою актуальную акцию.",type:"Акция"}
+ ],
+ services:[
+  {id:"s1",icon:"⌂",name:"Основная услуга",desc:"Описание направления"},
+  {id:"s2",icon:"▣",name:"Вторая услуга",desc:"Описание направления"},
+  {id:"s3",icon:"◇",name:"Дополнительная услуга",desc:"Описание направления"},
+  {id:"s4",icon:"₽",name:"Калькулятор",desc:"Рассчитать стоимость"}
+ ],
+ projects:[
+  {tag:"Проект",name:"Ваш главный продукт",desc:"Короткое описание товара или услуги.",price:"от 100 000 ₽"}
+ ],
+ leads:[]
+};
+
+const KEY="business_mini_app_v3_data";
+let DATA=loadData(), editingNewsId=null, editingServiceId=null;
+
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function loadData(){
+ try{
+  const saved=localStorage.getItem(KEY);
+  if(saved){const d=JSON.parse(saved); return Object.assign(clone(DEFAULT_DATA),d)}
+ }catch(e){}
+ return clone(DEFAULT_DATA);
+}
+function persist(){localStorage.setItem(KEY,JSON.stringify(DATA));}
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+function render(){
+ brand.textContent=DATA.brand; ey.textContent=DATA.ey; heroTitle.textContent=DATA.hero; heroText.textContent=DATA.heroText;
+ tabs.innerHTML=DATA.tabs.map((x,i)=>`<button class="tab ${i?'':'active'}" onclick="filterTab(this)">${esc(x)}</button>`).join('');
+ news.innerHTML=DATA.news.map(x=>`<article class="news"><b>${esc(x.title)}</b><p>${esc(x.text)}</p><small>${esc(x.type)}</small></article>`).join('') || '<p>Новостей пока нет.</p>';
+ services.innerHTML=DATA.services.map(x=>`<button class="tile" onclick="detail('${esc(x.name)}','${esc(x.desc)}')"><div class="ico">${esc(x.icon)}</div><b>${esc(x.name)}</b><span>${esc(x.desc)}</span></button>`).join('');
+ catalogList.innerHTML=DATA.services.map(x=>`<button class="row" onclick="detail('${esc(x.name)}','${esc(x.desc)}')"><b>${esc(x.name)}</b><span>${esc(x.desc)}</span></button>`).join('');
+ projects.innerHTML=DATA.projects.map(x=>`<article class="card"><div class="cover"><div class="house"></div></div><div class="body"><div class="tag">${esc(x.tag)}</div><h3>${esc(x.name)}</h3><p>${esc(x.desc)}</p><div class="meta"><b>${esc(x.price)}</b><button class="round" onclick="detail('${esc(x.name)}','${esc(x.desc)}')">→</button></div></div></article>`).join('');
+ newsCount.textContent=DATA.news.length; serviceCount.textContent=DATA.services.length; leadCount.textContent=DATA.leads.length;
+ renderAdminLists();
+}
+function renderAdminLists(){
+ newsAdmin.innerHTML=DATA.news.map(x=>`<div class="manage"><div class="manage-main"><b>${esc(x.title)}</b><span>${esc(x.type)}</span></div><button class="mini" onclick="editNews('${x.id}')">Изм.</button><button class="mini d" onclick="deleteNews('${x.id}')">×</button></div>`).join('') || '<div class="hint">Нет записей</div>';
+ serviceAdmin.innerHTML=DATA.services.map(x=>`<div class="manage"><div class="manage-main"><b>${esc(x.name)}</b><span>${esc(x.desc)}</span></div><button class="mini" onclick="editService('${x.id}')">Изм.</button><button class="mini d" onclick="deleteService('${x.id}')">×</button></div>`).join('') || '<div class="hint">Нет услуг</div>';
+ leadAdmin.innerHTML=DATA.leads.map(x=>`<div class="manage"><div class="manage-main"><b>${esc(x.name)} — ${esc(x.contact)}</b><span>${esc(x.comment||"Без комментария")} · ${esc(x.date)}</span></div></div>`).join('') || '<div class="hint">Заявок пока нет</div>';
+}
+function show(id,b){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));b.classList.add('active');scrollTo(0,0)}
+function filterTab(b){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');toast('Фильтр: '+b.textContent)}
+function openAdmin(){document.getElementById('adminModal').classList.add('open');render()}
+function openNewsEditor(id=null){
+ editingNewsId=id;
+ const x=id?DATA.news.find(n=>n.id===id):null;
+ newsEditorTitle.textContent=id?"Редактировать новость":"Новая новость";
+ newsTitle.value=x?.title||""; newsText.value=x?.text||""; newsType.value=x?.type||"Новость";
+ closeM('adminModal'); document.getElementById('newsModal').classList.add('open');
+}
+function saveNews(){
+ if(!newsTitle.value.trim()||!newsText.value.trim()){toast('Заполните заголовок и текст');return}
+ const obj={id:editingNewsId||"n_"+Date.now(),title:newsTitle.value.trim(),text:newsText.value.trim(),type:newsType.value};
+ if(editingNewsId){const i=DATA.news.findIndex(x=>x.id===editingNewsId);DATA.news[i]=obj}else DATA.news.unshift(obj);
+ persist();closeM('newsModal');render();openAdmin();toast(editingNewsId?'Новость изменена':'Новость добавлена');
+}
+function editNews(id){openNewsEditor(id)}
+function deleteNews(id){if(!confirm("Удалить эту новость?"))return;DATA.news=DATA.news.filter(x=>x.id!==id);persist();render();toast('Новость удалена')}
+function openServiceEditor(id=null){
+ editingServiceId=id;
+ const x=id?DATA.services.find(s=>s.id===id):null;
+ serviceEditorTitle.textContent=id?"Редактировать услугу":"Новая услуга";
+ serviceName.value=x?.name||"";serviceDesc.value=x?.desc||"";serviceIcon.value=x?.icon||"🔧";
+ closeM('adminModal');document.getElementById('serviceModal').classList.add('open');
+}
+function saveService(){
+ if(!serviceName.value.trim()||!serviceDesc.value.trim()){toast('Заполните название и описание');return}
+ const obj={id:editingServiceId||"s_"+Date.now(),name:serviceName.value.trim(),desc:serviceDesc.value.trim(),icon:serviceIcon.value.trim()||"🔧"};
+ if(editingServiceId){const i=DATA.services.findIndex(x=>x.id===editingServiceId);DATA.services[i]=obj}else DATA.services.push(obj);
+ persist();closeM('serviceModal');render();openAdmin();toast(editingServiceId?'Услуга изменена':'Услуга добавлена');
+}
+function editService(id){openServiceEditor(id)}
+function deleteService(id){if(!confirm("Удалить эту услугу?"))return;DATA.services=DATA.services.filter(x=>x.id!==id);persist();render();toast('Услуга удалена')}
+function openSettings(){
+ setBrand.value=DATA.brand;setEy.value=DATA.ey;setHero.value=DATA.hero;setHeroText.value=DATA.heroText;
+ closeM('adminModal');document.getElementById('settingsModal').classList.add('open');
+}
+function saveSettings(){
+ DATA.brand=setBrand.value.trim()||DEFAULT_DATA.brand;DATA.ey=setEy.value.trim()||DEFAULT_DATA.ey;DATA.hero=setHero.value.trim()||DEFAULT_DATA.hero;DATA.heroText=setHeroText.value.trim()||DEFAULT_DATA.heroText;
+ persist();closeM('settingsModal');render();openAdmin();toast('Настройки сохранены');
+}
+function detail(t,d){dt.textContent=t;dd.textContent=d;document.getElementById('detailModal').classList.add('open')}
+function openLead(){document.getElementById('leadModal').classList.add('open')}
+function closeM(id){document.getElementById(id).classList.remove('open')}
+function sendLead(){
+ if(!leadName.value.trim()||!leadContact.value.trim()){toast('Заполните имя и контакт');return}
+ DATA.leads.unshift({id:"l_"+Date.now(),name:leadName.value.trim(),contact:leadContact.value.trim(),comment:leadComment.value.trim(),date:new Date().toLocaleString("ru-RU")});
+ persist();leadName.value="";leadContact.value="";leadComment.value="";closeM('leadModal');toast('Заявка сохранена');render();
+}
+function telegramChat(){
+ if(window.Telegram?.WebApp){toast('Telegram WebApp подключён — чат можно привязать к боту')}else toast('После подключения бота здесь откроется Telegram-чат')
+}
+function exportData(){
+ const blob=new Blob([JSON.stringify(DATA,null,2)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="business-mini-app-data.json";a.click();URL.revokeObjectURL(a.href);
+}
+function importData(e){
+ const file=e.target.files[0];if(!file)return;
+ const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);DATA=Object.assign(clone(DEFAULT_DATA),d);persist();render();toast('Данные импортированы')}catch(err){toast('Ошибка JSON')}};r.readAsText(file);e.target.value="";
+}
+function toast(t){let x=document.getElementById('toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),2400)}
+window.addEventListener("load",()=>{try{window.Telegram?.WebApp?.ready();window.Telegram?.WebApp?.expand()}catch(e){};render()});
+</script>
+</body>
+</html>
