@@ -14,7 +14,7 @@
 <body>
 <header class="wrap nav">
 <a class="brand" href="#home"><span class="logo">C</span><span>CREONOVA<span style="color:#8f85ff">.</span></span></a>
-<nav class="navlinks"><a href="#services">Услуги</a><a href="#works">Решения</a><a href="#process">Как работаем</a><a href="#contact">Контакты</a></nav>
+<nav class="navlinks"><a href="#services">Услуги</a><a href="#works">Решения</a><a href="#portfolio">Портфолио</a><a href="#process">Как работаем</a><a href="#contact">Контакты</a></nav>
 <div class="navright"><span class="pill">Digital studio · 2026</span><a class="btn btn-main" href="#contact">Обсудить проект ↗</a></div>
 </header>
 <main id="home" class="wrap">
@@ -38,6 +38,13 @@
 <section class="section" id="works"><div class="section-head"><div><div class="kicker">Примеры решений</div><h2>От идеи — к продукту</h2></div><p class="sub">Демонстрационные концепции. Каждый проект можно адаптировать под фирменный стиль и процессы вашего бизнеса.</p></div>
 <div class="showcase"><article class="project"><span class="tag">DEMO · MINI APP</span><h3>Витрина услуг</h3><p>Каталог, новости, акции и контакты — компактное приложение, которое удобно открыть с телефона.</p><div class="project-art"></div></article><article class="project"><span class="tag">DEMO · AUTOMATION</span><h3>Умный помощник</h3><p>Сценарии для обработки типовых вопросов и упрощения общения с клиентами.</p><div class="project-art" style="border-color:#66e5df65;transform:rotate(10deg);right:-28px"></div></article></div>
 </section>
+
+<section class="section" id="portfolio"><div class="section-head"><div><div class="kicker">Ваши проекты</div><h2>Портфолио</h2></div><p class="sub">Примеры работ и концепций. Добавляйте свои проекты через панель управления.</p></div>
+<div class="showcase" id="portfolioGrid">
+<article class="project"><span class="tag">DEMO · MINI APP</span><h3>Витрина услуг</h3><p>Компактное приложение для демонстрации услуг, новостей и контактов бизнеса.</p><div class="project-art"></div></article>
+<article class="project"><span class="tag">DEMO · AUTOMATION</span><h3>Умный помощник</h3><p>Концепция цифрового помощника для типовых вопросов и рабочих задач.</p><div class="project-art" style="border-color:#66e5df65;transform:rotate(10deg);right:-28px"></div></article>
+</div></section>
+
 <section class="section" id="process"><div class="section-head"><div><div class="kicker">Простой процесс</div><h2>Понятно на каждом этапе</h2></div></div><div class="steps"><div class="step"><div class="num">01 / ЗАДАЧА</div><h3>Обсуждаем идею</h3><p>Уточняем цели, аудиторию и необходимые функции.</p></div><div class="step"><div class="num">02 / ПЛАН</div><h3>Согласуем решение</h3><p>Определяем структуру, внешний вид и объём работ.</p></div><div class="step"><div class="num">03 / СОЗДАНИЕ</div><h3>Собираем продукт</h3><p>Разрабатываем, показываем промежуточный результат и дорабатываем.</p></div><div class="step"><div class="num">04 / ЗАПУСК</div><h3>Передаём вам</h3><p>Проверяем основные сценарии и объясняем управление.</p></div></div></section>
 <section class="section" id="contact"><div class="cta"><div><div class="kicker">Есть идея?</div><h2>Давайте создадим что-то полезное.</h2><p>Расскажите, что нужно вашему бизнесу. Обсудим формат, сроки и следующий шаг.</p></div><a class="btn btn-main" href="#contact-options">Связаться с Creonova ↗</a></div>
 <div class="contact-grid" id="contact-options" style="margin-top:16px"><div class="contact-box"><h3>✈ Telegram</h3><p>Напишите, чтобы обсудить проект или задать вопрос.</p><a class="btn btn-ghost" id="tgLink" href="https://t.me/neironing" target="_blank" rel="noopener">Открыть Telegram ↗</a></div><div class="contact-box"><h3>◉ MAX</h3><p>Можно связаться через MAX, если у вас уже есть контакт или публичная ссылка.</p><a class="btn btn-ghost" id="maxLink" href="https://max.ru/u/f9LHodD0cOIuZG8wsMDbsr_qE602zLVHG0y8VUxY2Bt8oGgb2eQpXN6VgXM" target="_blank" rel="noopener">Открыть MAX ↗</a></div></div>
@@ -52,6 +59,16 @@
 <div class="field"><label for="heroText">Описание первого экрана</label><textarea id="heroText">Создаём сайты, мини-приложения и AI-инструменты, которые помогают бизнесу выглядеть современно, быстрее работать и находить новых клиентов.</textarea></div>
 <div class="field"><label for="tgUrl">Ссылка на Telegram (например, https://t.me/username)</label><input id="tgUrl" placeholder="https://t.me/ваш_username"></div>
 <div class="field"><label for="maxUrl">Публичная ссылка или контакт MAX</label><input id="maxUrl" placeholder="Вставьте вашу ссылку MAX"></div>
+
+<div style="border-top:1px solid var(--line);margin-top:22px;padding-top:18px"><div class="kicker">PORTFOLIO</div><h3 style="margin:4px 0 10px">Управление портфолио</h3>
+<div class="field"><label for="portfolioTitle">Название проекта</label><input id="portfolioTitle" placeholder="Например, Сайт для кофейни"></div>
+<div class="field"><label for="portfolioDescription">Описание проекта</label><textarea id="portfolioDescription" placeholder="Что было сделано и какую задачу решает проект"></textarea></div>
+<div class="field"><label for="portfolioUrl">Ссылка на проект (необязательно)</label><input id="portfolioUrl" placeholder="https://..."></div>
+<div class="field"><label for="portfolioImage">Ссылка на изображение (необязательно)</label><input id="portfolioImage" placeholder="https://.../image.jpg"></div>
+<button class="btn btn-main" id="savePortfolio">+ Добавить проект</button>
+<div class="admin-list" id="portfolioAdminList"></div>
+<p class="note">Изображения и ссылки должны быть общедоступными. Проекты пока сохраняются только в этом браузере.</p></div>
+
 <div class="field"><label for="serviceTitle">Название услуги</label><input id="serviceTitle" placeholder="Например, Сайт для бизнеса"></div>
 <div class="field"><label for="serviceDescription">Описание услуги</label><textarea id="serviceDescription" placeholder="Коротко опишите, что входит в услугу"></textarea></div>
 <div class="field"><label for="servicePrice">Цена (необязательно)</label><input id="servicePrice" placeholder="Например, от 15 000 ₽ или Цена по запросу"></div>
@@ -62,7 +79,7 @@
 <script>
 const $=id=>document.getElementById(id);
 const KEY='creonova-v4-local';
-const defaults={brandTitle:'CREONOVA',heroTitle:'Ваш бизнес. Новый уровень.',heroText:'Создаём сайты, мини-приложения и AI-инструменты, которые помогают бизнесу выглядеть современно, быстрее работать и находить новых клиентов.',tgUrl:'https://t.me/neironing',maxUrl:'https://max.ru/u/f9LHodD0cOIuZG8wsMDbsr_qE602zLVHG0y8VUxY2Bt8oGgb2eQpXN6VgXM',customServices:[]};
+const defaults={brandTitle:'CREONOVA',heroTitle:'Ваш бизнес. Новый уровень.',heroText:'Создаём сайты, мини-приложения и AI-инструменты, которые помогают бизнесу выглядеть современно, быстрее работать и находить новых клиентов.',tgUrl:'https://t.me/neironing',maxUrl:'https://max.ru/u/f9LHodD0cOIuZG8wsMDbsr_qE602zLVHG0y8VUxY2Bt8oGgb2eQpXN6VgXM',customServices:[],portfolio:[]};
 let state={...defaults};
 try{state={...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){}
 function toast(msg='Изменения сохранены в этом браузере'){$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2200)}
@@ -88,13 +105,56 @@ function renderCustom(){
   const link=document.createElement('a');link.href='#contact';link.textContent='Обсудить услугу ↗';card.append(link);grid.append(card);
  });
 }
+
+function renderPortfolio(){
+ const grid=$('portfolioGrid');if(!grid)return;
+ grid.querySelectorAll('[data-managed-portfolio="true"]').forEach(el=>el.remove());
+ const list=$('portfolioAdminList');if(list)list.innerHTML='';
+ state.portfolio=Array.isArray(state.portfolio)?state.portfolio:[];
+ state.portfolio.forEach((item,i)=>{
+  const card=document.createElement('article');card.className='project';card.dataset.managedPortfolio='true';
+  if(item.image && /^https?:\/\//i.test(item.image)){
+   const img=document.createElement('img');img.src=item.image;img.alt=item.title;img.loading='lazy';
+   img.style.cssText='width:100%;height:145px;object-fit:cover;border-radius:12px;margin:8px 0 14px;border:1px solid var(--line)';
+   img.onerror=()=>img.remove();card.append(img);
+  }else{
+   const art=document.createElement('div');art.className='project-art';card.append(art);
+  }
+  const tag=document.createElement('span');tag.className='tag';tag.textContent='ПРОЕКТ';card.append(tag);
+  const h=document.createElement('h3');h.textContent=item.title;card.append(h);
+  const p=document.createElement('p');p.textContent=item.description||'Описание проекта';card.append(p);
+  if(item.url && /^https?:\/\//i.test(item.url)){const a=document.createElement('a');a.href=item.url;a.target='_blank';a.rel='noopener';a.className='btn btn-ghost';a.style.marginTop='10px';a.textContent='Открыть проект ↗';card.append(a)}
+  grid.append(card);
+  if(list){
+   const row=document.createElement('div');row.className='admin-row';
+   const name=document.createElement('span');name.textContent=item.title;
+   const controls=document.createElement('div');controls.style.cssText='display:flex;gap:6px';
+   const edit=document.createElement('button');edit.className='small-btn';edit.textContent='Изменить';edit.onclick=()=>{$('portfolioTitle').value=item.title;$('portfolioDescription').value=item.description||'';$('portfolioUrl').value=item.url||'';$('portfolioImage').value=item.image||'';$('savePortfolio').dataset.editIndex=String(i);$('savePortfolio').textContent='Сохранить изменения'};
+   const del=document.createElement('button');del.className='small-btn';del.textContent='Удалить';del.onclick=()=>{if(!confirm('Удалить проект «'+item.title+'»?'))return;state.portfolio.splice(i,1);persist();renderPortfolio();toast('Проект удалён')};
+   controls.append(edit,del);row.append(name,controls);list.append(row);
+  }
+ });
+}
+
 function apply(){document.title=(state.brandTitle||'CREONOVA')+' — цифровые решения для бизнеса';document.querySelector('.brand span:nth-child(2)').textContent=state.brandTitle||'CREONOVA';const h=$('heroTitle').value||defaults.heroTitle;const parts=h.split('. ');document.querySelector('h1').innerHTML=parts.length>1?`${escapeHtml(parts[0])}.<br><span>${escapeHtml(parts.slice(1).join('. '))}</span>`:`<span>${escapeHtml(h)}</span>`;document.querySelector('.hero>div p').textContent=state.heroText||defaults.heroText;if(state.tgUrl&&/^https:\/\/t\.me\//i.test(state.tgUrl))$('tgLink').href=state.tgUrl;if(state.maxUrl&&/^https:\/\//i.test(state.maxUrl))$('maxLink').href=state.maxUrl}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function persist(){localStorage.setItem(KEY,JSON.stringify(state))}
-function fillForm(){ $('brandTitle').value=state.brandTitle;$('heroTitle').value=state.heroTitle;$('heroText').value=state.heroText;$('tgUrl').value=state.tgUrl;$('maxUrl').value=state.maxUrl;renderCustom()}
+function fillForm(){ $('brandTitle').value=state.brandTitle;$('heroTitle').value=state.heroTitle;$('heroText').value=state.heroText;$('tgUrl').value=state.tgUrl;$('maxUrl').value=state.maxUrl;renderCustom();renderPortfolio()}
 function openAdmin(){fillForm();$('adminModal').classList.add('open')}
 $('adminOpen').onclick=openAdmin;$('adminClose').onclick=()=>$('adminModal').classList.remove('open');$('adminModal').onclick=e=>{if(e.target===$('adminModal'))$('adminModal').classList.remove('open')};
 $('saveAdmin').onclick=()=>{state.brandTitle=$('brandTitle').value.trim()||defaults.brandTitle;state.heroTitle=$('heroTitle').value.trim()||defaults.heroTitle;state.heroText=$('heroText').value.trim()||defaults.heroText;state.tgUrl=$('tgUrl').value.trim();state.maxUrl=$('maxUrl').value.trim();persist();apply();$('adminModal').classList.remove('open');toast()};
+
+
+$('savePortfolio').onclick=()=>{
+ const title=$('portfolioTitle').value.trim();if(!title){toast('Укажите название проекта');return}
+ const item={title,description:$('portfolioDescription').value.trim(),url:$('portfolioUrl').value.trim(),image:$('portfolioImage').value.trim()};
+ if(item.url && !/^https?:\/\//i.test(item.url)){toast('Ссылка проекта должна начинаться с https://');return}
+ if(item.image && !/^https?:\/\//i.test(item.image)){toast('Ссылка на изображение должна начинаться с https://');return}
+ const editIndex=$('savePortfolio').dataset.editIndex;
+ if(editIndex!==undefined){state.portfolio[Number(editIndex)]=item;delete $('savePortfolio').dataset.editIndex;$('savePortfolio').textContent='+ Добавить проект';toast('Проект обновлён')}
+ else{state.portfolio.push(item);toast('Проект добавлен в портфолио')}
+ $('portfolioTitle').value='';$('portfolioDescription').value='';$('portfolioUrl').value='';$('portfolioImage').value='';persist();renderPortfolio();
+};
 
 $('saveService').onclick=()=>{
  const title=$('serviceTitle').value.trim();if(!title){toast('Укажите название услуги');return}
@@ -104,7 +164,7 @@ $('saveService').onclick=()=>{
  else{state.customServices.push(item);toast('Услуга добавлена в каталог')}
  $('serviceTitle').value='';$('serviceDescription').value='';$('servicePrice').value='';persist();renderCustom();
 };
-$('resetAdmin').onclick=()=>{if(!confirm('Сбросить локальные изменения?'))return;state={...defaults,customServices:[]};persist();fillForm();apply();toast('Изменения сброшены')};
+$('resetAdmin').onclick=()=>{if(!confirm('Сбросить локальные изменения?'))return;state={...defaults,customServices:[],portfolio:[]};persist();fillForm();apply();toast('Изменения сброшены')};
 $('year').textContent=new Date().getFullYear();fillForm();apply();
 </script>
 </body></html>
