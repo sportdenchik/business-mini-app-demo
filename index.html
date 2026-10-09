@@ -52,8 +52,10 @@
 <div class="field"><label for="heroText">Описание первого экрана</label><textarea id="heroText">Создаём сайты, мини-приложения и AI-инструменты, которые помогают бизнесу выглядеть современно, быстрее работать и находить новых клиентов.</textarea></div>
 <div class="field"><label for="tgUrl">Ссылка на Telegram (например, https://t.me/username)</label><input id="tgUrl" placeholder="https://t.me/ваш_username"></div>
 <div class="field"><label for="maxUrl">Публичная ссылка или контакт MAX</label><input id="maxUrl" placeholder="Вставьте вашу ссылку MAX"></div>
-<div class="field"><label for="newService">Добавить услугу в личный список</label><input id="newService" placeholder="Например, Разработка сайта"></div>
-<button class="btn btn-main" id="addService">+ Добавить услугу</button>
+<div class="field"><label for="serviceTitle">Название услуги</label><input id="serviceTitle" placeholder="Например, Сайт для бизнеса"></div>
+<div class="field"><label for="serviceDescription">Описание услуги</label><textarea id="serviceDescription" placeholder="Коротко опишите, что входит в услугу"></textarea></div>
+<div class="field"><label for="servicePrice">Цена (необязательно)</label><input id="servicePrice" placeholder="Например, от 15 000 ₽ или Цена по запросу"></div>
+<button class="btn btn-main" id="saveService">+ Добавить услугу в каталог</button>
 <div class="admin-list" id="customServices"></div>
 <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px"><button class="btn btn-main" id="saveAdmin">Сохранить изменения</button><button class="btn btn-ghost" id="resetAdmin">Сбросить изменения</button></div>
 </div></div><div class="toast" id="toast">Изменения сохранены в этом браузере</div>
@@ -64,7 +66,28 @@ const defaults={brandTitle:'CREONOVA',heroTitle:'Ваш бизнес. Новый
 let state={...defaults};
 try{state={...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){}
 function toast(msg='Изменения сохранены в этом браузере'){$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2200)}
-function renderCustom(){const list=$('customServices');list.innerHTML='';state.customServices.forEach((s,i)=>{const row=document.createElement('div');row.className='admin-row';const title=document.createElement('span');title.textContent=s;const del=document.createElement('button');del.className='small-btn';del.textContent='Удалить';del.onclick=()=>{state.customServices.splice(i,1);persist();renderCustom()};row.append(title,del);list.append(row)})}
+function renderCustom(){
+ const list=$('customServices');list.innerHTML='';
+ const grid=$('servicesGrid');
+ grid.querySelectorAll('[data-custom-service="true"]').forEach(el=>el.remove());
+ state.customServices.forEach((s,i)=>{
+  const row=document.createElement('div');row.className='admin-row';
+  const title=document.createElement('span');title.textContent=s.title;
+  const controls=document.createElement('div');controls.style.display='flex';controls.style.gap='6px';
+  const edit=document.createElement('button');edit.className='small-btn';edit.textContent='Изменить';
+  edit.onclick=()=>{$('serviceTitle').value=s.title;$('serviceDescription').value=s.description||'';$('servicePrice').value=s.price||'';$('saveService').textContent='Сохранить изменения';$('saveService').dataset.editIndex=String(i);$('serviceTitle').focus()};
+  const del=document.createElement('button');del.className='small-btn';del.textContent='Удалить';
+  del.onclick=()=>{if(!confirm('Удалить услугу «'+s.title+'»?'))return;state.customServices.splice(i,1);persist();renderCustom();toast('Услуга удалена')};
+  controls.append(edit,del);row.append(title,controls);list.append(row);
+  const card=document.createElement('article');card.className='card';card.dataset.customService='true';
+  const symbol=document.createElement('div');symbol.className='symbol';symbol.textContent='✦';
+  const h=document.createElement('h3');h.textContent=s.title;
+  const p=document.createElement('p');p.textContent=s.description||'Подробности обсудим индивидуально.';
+  card.append(symbol,h,p);
+  if(s.price){const price=document.createElement('span');price.className='tag';price.textContent=s.price;card.append(price)}
+  const link=document.createElement('a');link.href='#contact';link.textContent='Обсудить услугу ↗';card.append(link);grid.append(card);
+ });
+}
 function apply(){document.title=(state.brandTitle||'CREONOVA')+' — цифровые решения для бизнеса';document.querySelector('.brand span:nth-child(2)').textContent=state.brandTitle||'CREONOVA';const h=$('heroTitle').value||defaults.heroTitle;const parts=h.split('. ');document.querySelector('h1').innerHTML=parts.length>1?`${escapeHtml(parts[0])}.<br><span>${escapeHtml(parts.slice(1).join('. '))}</span>`:`<span>${escapeHtml(h)}</span>`;document.querySelector('.hero>div p').textContent=state.heroText||defaults.heroText;if(state.tgUrl&&/^https:\/\/t\.me\//i.test(state.tgUrl))$('tgLink').href=state.tgUrl;if(state.maxUrl&&/^https:\/\//i.test(state.maxUrl))$('maxLink').href=state.maxUrl}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function persist(){localStorage.setItem(KEY,JSON.stringify(state))}
@@ -72,7 +95,15 @@ function fillForm(){ $('brandTitle').value=state.brandTitle;$('heroTitle').value
 function openAdmin(){fillForm();$('adminModal').classList.add('open')}
 $('adminOpen').onclick=openAdmin;$('adminClose').onclick=()=>$('adminModal').classList.remove('open');$('adminModal').onclick=e=>{if(e.target===$('adminModal'))$('adminModal').classList.remove('open')};
 $('saveAdmin').onclick=()=>{state.brandTitle=$('brandTitle').value.trim()||defaults.brandTitle;state.heroTitle=$('heroTitle').value.trim()||defaults.heroTitle;state.heroText=$('heroText').value.trim()||defaults.heroText;state.tgUrl=$('tgUrl').value.trim();state.maxUrl=$('maxUrl').value.trim();persist();apply();$('adminModal').classList.remove('open');toast()};
-$('addService').onclick=()=>{const s=$('newService').value.trim();if(!s)return;state.customServices.push(s);$('newService').value='';persist();renderCustom();toast('Услуга добавлена в локальный список')};
+
+$('saveService').onclick=()=>{
+ const title=$('serviceTitle').value.trim();if(!title){toast('Укажите название услуги');return}
+ const item={title,description:$('serviceDescription').value.trim(),price:$('servicePrice').value.trim()};
+ const editIndex=$('saveService').dataset.editIndex;
+ if(editIndex!==undefined){state.customServices[Number(editIndex)]=item;delete $('saveService').dataset.editIndex;$('saveService').textContent='+ Добавить услугу в каталог';toast('Услуга обновлена')}
+ else{state.customServices.push(item);toast('Услуга добавлена в каталог')}
+ $('serviceTitle').value='';$('serviceDescription').value='';$('servicePrice').value='';persist();renderCustom();
+};
 $('resetAdmin').onclick=()=>{if(!confirm('Сбросить локальные изменения?'))return;state={...defaults,customServices:[]};persist();fillForm();apply();toast('Изменения сброшены')};
 $('year').textContent=new Date().getFullYear();fillForm();apply();
 </script>
