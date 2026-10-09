@@ -40,8 +40,8 @@
 </section>
 <section class="section" id="process"><div class="section-head"><div><div class="kicker">Простой процесс</div><h2>Понятно на каждом этапе</h2></div></div><div class="steps"><div class="step"><div class="num">01 / ЗАДАЧА</div><h3>Обсуждаем идею</h3><p>Уточняем цели, аудиторию и необходимые функции.</p></div><div class="step"><div class="num">02 / ПЛАН</div><h3>Согласуем решение</h3><p>Определяем структуру, внешний вид и объём работ.</p></div><div class="step"><div class="num">03 / СОЗДАНИЕ</div><h3>Собираем продукт</h3><p>Разрабатываем, показываем промежуточный результат и дорабатываем.</p></div><div class="step"><div class="num">04 / ЗАПУСК</div><h3>Передаём вам</h3><p>Проверяем основные сценарии и объясняем управление.</p></div></div></section>
 <section class="section" id="contact"><div class="cta"><div><div class="kicker">Есть идея?</div><h2>Давайте создадим что-то полезное.</h2><p>Расскажите, что нужно вашему бизнесу. Обсудим формат, сроки и следующий шаг.</p></div><a class="btn btn-main" href="#contact-options">Связаться с Creonova ↗</a></div>
-<div class="contact-grid" id="contact-options" style="margin-top:16px"><div class="contact-box"><h3>✈ Telegram</h3><p>Напишите, чтобы обсудить проект или задать вопрос.</p><a class="btn btn-ghost" id="tgLink" href="https://t.me/" target="_blank" rel="noopener">Открыть Telegram ↗</a></div><div class="contact-box"><h3>◉ MAX</h3><p>Можно связаться через MAX, если у вас уже есть контакт или публичная ссылка.</p><a class="btn btn-ghost" id="maxLink" href="https://max.ru/" target="_blank" rel="noopener">Открыть MAX ↗</a></div></div>
-<p class="note" style="margin-top:12px">Контакты пока демонстрационные. Укажите свои ссылки в админ-панели, прежде чем делиться страницей с заказчиками.</p></section>
+<div class="contact-grid" id="contact-options" style="margin-top:16px"><div class="contact-box"><h3>✈ Telegram</h3><p>Напишите, чтобы обсудить проект или задать вопрос.</p><a class="btn btn-ghost" id="tgLink" href="https://t.me/neironing" target="_blank" rel="noopener">Открыть Telegram ↗</a></div><div class="contact-box"><h3>◉ MAX</h3><p>Можно связаться через MAX, если у вас уже есть контакт или публичная ссылка.</p><a class="btn btn-ghost" id="maxLink" href="https://max.ru/u/f9LHodD0cOIuZG8wsMDbsr_qE602zLVHG0y8VUxY2Bt8oGgb2eQpXN6VgXM" target="_blank" rel="noopener">Открыть MAX ↗</a></div></div>
+<p class="note" style="margin-top:12px">Контакты подключены: кнопки Telegram и MAX ведут на указанные профили.</p></section>
 </main>
 <footer class="wrap footer"><span>© <span id="year"></span> CREONOVA. Цифровые решения для бизнеса.</span><span>Создано с вниманием к деталям.</span><span><a href="#home">Наверх ↑</a></span></footer>
 <button class="admin-fab" id="adminOpen" type="button">⚙ Управление витриной</button>
@@ -60,7 +60,7 @@
 <script>
 const $=id=>document.getElementById(id);
 const KEY='creonova-v4-local';
-const defaults={brandTitle:'CREONOVA',heroTitle:'Ваш бизнес. Новый уровень.',heroText:'Создаём сайты, мини-приложения и AI-инструменты, которые помогают бизнесу выглядеть современно, быстрее работать и находить новых клиентов.',tgUrl:'',maxUrl:'',customServices:[]};
+const defaults={brandTitle:'CREONOVA',heroTitle:'Ваш бизнес. Новый уровень.',heroText:'Создаём сайты, мини-приложения и AI-инструменты, которые помогают бизнесу выглядеть современно, быстрее работать и находить новых клиентов.',tgUrl:'https://t.me/neironing',maxUrl:'https://max.ru/u/f9LHodD0cOIuZG8wsMDbsr_qE602zLVHG0y8VUxY2Bt8oGgb2eQpXN6VgXM',customServices:[]};
 let state={...defaults};
 try{state={...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){}
 function toast(msg='Изменения сохранены в этом браузере'){$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2200)}
