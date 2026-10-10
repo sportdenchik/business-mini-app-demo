@@ -57,7 +57,7 @@
 <footer class="wrap footer"><span>© <span id="year"></span> CREONOVA. Цифровые решения для бизнеса.</span><span>Создано с вниманием к деталям.</span><span><a href="#home">Наверх ↑</a></span></footer>
 <button class="admin-fab" id="adminOpen" type="button">⚙ Управление витриной</button>
 <div class="modal" id="adminModal" role="dialog" aria-modal="true" aria-label="Управление витриной"><div class="modal-card"><div class="modal-head"><div><div class="kicker">LOCAL ADMIN</div><h2 style="margin:4px 0;font-size:24px">Управление витриной</h2></div><button class="close" id="adminClose">Закрыть ✕</button></div>
-<p class="note">Изменения сохраняются в общей базе Cloudflare. При первом сохранении потребуется ADMIN_TOKEN из настроек Worker. Не передавайте токен посторонним.</p>
+<p class="note">Для входа требуется пароль администратора. Сеанс действует ограниченное время; не передавайте пароль посторонним.</p>
 <div class="field"><label for="brandTitle">Название</label><input id="brandTitle" value="CREONOVA"></div>
 <div class="field"><label for="heroTitle">Заголовок первого экрана</label><input id="heroTitle" value="Ваш бизнес. Новый уровень."></div>
 <div class="field"><label for="heroText">Описание первого экрана</label><textarea id="heroText">Создаём сайты, мини-приложения и AI-инструменты, которые помогают бизнесу выглядеть современно, быстрее работать и находить новых клиентов.</textarea></div>
@@ -176,32 +176,73 @@ function renderPortfolio(){
 function apply(){document.title=(state.brandTitle||'CREONOVA')+' — цифровые решения для бизнеса';document.querySelector('.brand span:nth-child(2)').textContent=state.brandTitle||'CREONOVA';const h=$('heroTitle').value||defaults.heroTitle;const parts=h.split('. ');document.querySelector('h1').innerHTML=parts.length>1?`${escapeHtml(parts[0])}.<br><span>${escapeHtml(parts.slice(1).join('. '))}</span>`:`<span>${escapeHtml(h)}</span>`;document.querySelector('.hero>div p').textContent=state.heroText||defaults.heroText;if(state.tgUrl&&/^https:\/\/t\.me\//i.test(state.tgUrl))$('tgLink').href=state.tgUrl;if(state.maxUrl&&/^https:\/\//i.test(state.maxUrl))$('maxLink').href=state.maxUrl}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 const API_URL='https://creonova-api.sportdenchik33.workers.dev';
-const TOKEN_KEY='creonova-admin-token-session';
+const SESSION_KEY='creonova-admin-session';
 let serverReady=false;
 let cloudSaveTimer=null;
 
-async function saveToCloud(){
-  if(!serverReady) return;
-  let token=sessionStorage.getItem(TOKEN_KEY);
-  if(!token){
-    token=prompt('Введите ADMIN_TOKEN из настроек Cloudflare. Токен не сохраняется в коде сайта.');
-    if(!token) { toast('Сохранено только в этом браузере'); return; }
-    token=token.trim();
-    if(!token) { toast('Сохранено только в этом браузере'); return; }
-    sessionStorage.setItem(TOKEN_KEY,token);
+function getSessionToken(){
+  try{return sessionStorage.getItem(SESSION_KEY)||''}catch(e){return ''}
+}
+function setSessionToken(token){
+  try{if(token)sessionStorage.setItem(SESSION_KEY,token);else sessionStorage.removeItem(SESSION_KEY)}catch(e){}
+}
+async function checkSession(){
+  const token=getSessionToken();
+  if(!token)return false;
+  try{
+    const response=await fetch(API_URL+'/api/session',{
+      method:'GET',
+      headers:{'Authorization':'Bearer '+token},
+      cache:'no-store'
+    });
+    if(response.ok)return true;
+  }catch(e){}
+  setSessionToken('');
+  return false;
+}
+async function loginAdmin(){
+  if(await checkSession()){
+    openAdmin();
+    return;
   }
+  const password=prompt('Введите пароль администратора Creonova:');
+  if(password===null)return;
+  if(!password.trim()){toast('Введите пароль');return}
+  try{
+    const response=await fetch(API_URL+'/api/login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({password:password})
+    });
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok||!data.token){
+      toast(response.status===401?'Неверный пароль':'Не удалось выполнить вход');
+      return;
+    }
+    setSessionToken(data.token);
+    openAdmin();
+    toast('Вход выполнен');
+  }catch(error){
+    console.error('Admin login failed:',error);
+    toast('Не удалось связаться с сервером авторизации');
+  }
+}
+async function saveToCloud(){
+  if(!serverReady)return;
+  const token=getSessionToken();
+  if(!token){toast('Войдите в админ-панель заново');return}
   try{
     const response=await fetch(API_URL+'/api/content',{
       method:'PUT',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-      body:JSON.stringify({content:state})
+      body:JSON.stringify(state)
     });
-    if(response.status===401 || response.status===403){
-      sessionStorage.removeItem(TOKEN_KEY);
-      toast('Cloudflare не принял токен. Проверьте ADMIN_TOKEN');
+    if(response.status===401||response.status===403){
+      setSessionToken('');
+      toast('Сессия завершилась. Войдите в админ-панель заново');
       return;
     }
-    if(!response.ok) throw new Error('HTTP '+response.status);
+    if(!response.ok)throw new Error('HTTP '+response.status);
     toast('Изменения сохранены в общей базе');
   }catch(error){
     console.error('Cloud save failed:',error);
@@ -216,10 +257,10 @@ function persist(){
 async function loadFromCloud(){
   try{
     const response=await fetch(API_URL+'/api/content',{method:'GET',cache:'no-store'});
-    if(!response.ok) throw new Error('HTTP '+response.status);
+    if(!response.ok)throw new Error('HTTP '+response.status);
     const data=await response.json();
     const remote=data&&data.content&&(data.content.content||data.content);
-    if(remote && typeof remote==='object' && Object.keys(remote).length){
+    if(remote&&typeof remote==='object'&&Object.keys(remote).length){
       state={...defaults,...remote};
       localStorage.setItem(KEY,JSON.stringify(state));
       fillForm();
@@ -234,7 +275,7 @@ async function loadFromCloud(){
 }
 function fillForm(){ $('brandTitle').value=state.brandTitle;$('heroTitle').value=state.heroTitle;$('heroText').value=state.heroText;$('tgUrl').value=state.tgUrl;$('maxUrl').value=state.maxUrl;renderCustom();renderPortfolio();renderNews()}
 function openAdmin(){fillForm();$('adminModal').classList.add('open')}
-$('adminOpen').onclick=openAdmin;$('adminClose').onclick=()=>$('adminModal').classList.remove('open');$('adminModal').onclick=e=>{if(e.target===$('adminModal'))$('adminModal').classList.remove('open')};
+$('adminOpen').onclick=loginAdmin;$('adminClose').onclick=()=>$('adminModal').classList.remove('open');$('adminModal').onclick=e=>{if(e.target===$('adminModal'))$('adminModal').classList.remove('open')};
 $('saveAdmin').onclick=()=>{state.brandTitle=$('brandTitle').value.trim()||defaults.brandTitle;state.heroTitle=$('heroTitle').value.trim()||defaults.heroTitle;state.heroText=$('heroText').value.trim()||defaults.heroText;state.tgUrl=$('tgUrl').value.trim();state.maxUrl=$('maxUrl').value.trim();persist();apply();$('adminModal').classList.remove('open');toast()};
 
 
