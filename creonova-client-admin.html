@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>CREONOVA — управление клиентами</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#121a2e;--panel2:#17213a;--line:#2a3653;--text:#f3f6ff;--muted:#9aa8c7;--accent:#8b9cff;--good:#7ce0b2;--bad:#ff9292}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#1a2750 0,transparent 55%),var(--bg);color:var(--text);font:15px/1.5 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:1120px;margin:auto;padding:28px 18px 60px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}.brand{font-size:14px;letter-spacing:.22em;color:#b8c4ff;font-weight:800}.top small{display:block;color:var(--muted);letter-spacing:0;margin-top:4px}.pill{border:1px solid var(--line);border-radius:999px;padding:7px 12px;color:var(--muted);font-size:12px}
+h1{font-size:clamp(28px,5vw,44px);line-height:1.08;letter-spacing:-.04em;margin:0 0 10px}h2{font-size:19px;margin:0 0 16px}.intro{color:var(--muted);max-width:680px;margin:0 0 28px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px}.panel{background:linear-gradient(145deg,rgba(23,33,58,.97),rgba(16,23,41,.97));border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 20px 60px #0002}
+label{display:block;font-size:13px;color:#c1cbe2;margin:0 0 7px}input,select,textarea{width:100%;background:#0b1224;border:1px solid #34415f;border-radius:11px;color:var(--text);padding:12px 13px;font:inherit;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--accent)}textarea{min-height:86px;resize:vertical}.field{margin-bottom:14px}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button{border:0;border-radius:11px;padding:12px 16px;font:700 14px inherit;cursor:pointer}.primary{background:linear-gradient(135deg,#9daaff,#7186ff);color:#0a1022}.secondary{background:#263451;color:#eaf0ff;border:1px solid #3b4b70}.danger{background:transparent;color:#ffb0b0;border:1px solid #74424c}.full{width:100%}.hidden{display:none!important}
+.note{color:var(--muted);font-size:12px;margin-top:9px}.status{padding:11px 13px;border-radius:10px;background:#0b1224;border:1px solid var(--line);color:var(--muted);margin:0 0 14px;white-space:pre-wrap;overflow-wrap:anywhere}.status.good{color:var(--good)}.status.bad{color:var(--bad)}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.stat{padding:12px 15px;background:#0b1224;border:1px solid var(--line);border-radius:13px;min-width:110px}.stat b{display:block;font-size:22px}.stat span{font-size:12px;color:var(--muted)}
+.client{border:1px solid var(--line);background:#0d1528;border-radius:14px;padding:15px;margin-top:11px}.client-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.client h3{margin:0;font-size:16px;overflow-wrap:anywhere}.slug{font:12px ui-monospace,monospace;color:#b7c4ff;margin-top:3px}.meta{font-size:12px;color:var(--muted);margin-top:10px}.tag{font-size:11px;border:1px solid #45577e;border-radius:999px;padding:4px 8px;color:#c8d3ff;white-space:nowrap}.tokenbox{margin-top:12px;border:1px solid #55755f;background:#10251e;border-radius:12px;padding:12px}.tokenbox strong{color:var(--good);font-size:12px}.token{overflow-wrap:anywhere;font:12px ui-monospace,monospace;margin:7px 0}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.actions button{font-size:12px;padding:8px 10px}.empty{color:var(--muted);text-align:center;padding:30px 12px}.footer{color:#697796;text-align:center;font-size:12px;margin-top:24px}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.wrap{padding:20px 12px 40px}.panel{padding:17px}.top{align-items:flex-start}.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div><div class="brand">CREONOVA</div><small>Панель владельца · клиенты и обслуживание</small></div>
+    <div class="pill" id="sessionBadge">Не авторизован</div>
+  </header>
+
+  <section id="loginPanel" class="panel" style="max-width:500px;margin:36px auto">
+    <h1 style="font-size:30px">Вход владельца</h1>
+    <p class="intro" style="margin-bottom:20px">Используй пароль существующей админки CREONOVA. Пароль и токены не сохраняются в браузере.</p>
+    <div id="loginStatus" class="status hidden"></div>
+    <form id="loginForm">
+      <div class="field"><label for="password">Пароль администратора</label><input id="password" type="password" autocomplete="current-password" required></div>
+      <button class="primary full" type="submit">Войти в панель</button>
+    </form>
+    <p class="note">Страница не содержит секретов. Авторизация проверяется сервером.</p>
+  </section>
+
+  <main id="app" class="hidden">
+    <h1>Управление клиентами</h1>
+    <p class="intro">Создавай отдельные пространства для бизнеса, отслеживай способ обслуживания и выдавай клиенту его доступ. Данные клиентов разделяются по уникальному адресу.</p>
+    <div id="globalStatus" class="status hidden"></div>
+    <div class="stats">
+      <div class="stat"><b id="totalCount">0</b><span>Всего клиентов</span></div>
+      <div class="stat"><b id="selfCount">0</b><span>Самостоятельно</span></div>
+      <div class="stat"><b id="managedCount">0</b><span>Ведёт CREONOVA</span></div>
+    </div>
+    <div class="grid">
+      <section class="panel">
+        <h2>＋ Новый клиент</h2>
+        <form id="createForm">
+          <div class="field"><label for="businessName">Название бизнеса *</label><input id="businessName" maxlength="120" placeholder="Например, Студия красоты Лилия" required></div>
+          <div class="field"><label for="slug">Уникальный адрес (slug) *</label><input id="slug" pattern="[a-z0-9](?:[a-z0-9-]{0,48}[a-z0-9])?" maxlength="50" placeholder="lilia-beauty" required><div class="note">Только латиница в нижнем регистре, цифры и дефисы. Адрес мини-приложения будет содержать этот slug.</div></div>
+          <div class="field"><label for="botUsername">Telegram-бот (необязательно)</label><input id="botUsername" maxlength="80" placeholder="@lilia_beauty_bot"></div>
+          <div class="field"><label for="serviceMode">Вариант обслуживания</label><select id="serviceMode"><option value="self">Клиент управляет сам</option><option value="managed">CREONOVA ведёт за ежемесячную плату</option></select></div>
+          <div class="field"><label for="notes">Заметки (необязательно)</label><textarea id="notes" maxlength="1000" placeholder="Контакты, договорённости, план обслуживания…"></textarea></div>
+          <button class="primary full" type="submit">Создать клиента</button>
+          <p class="note">После создания секретный ключ клиента появится один раз. Сразу сохрани его и передай безопасным способом.</p>
+        </form>
+      </section>
+      <section class="panel">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><h2 style="margin:0">Клиенты</h2><button id="refreshBtn" class="secondary" type="button">Обновить</button></div>
+        <div id="clientsList"><div class="empty">Загружаем список…</div></div>
+      </section>
+    </div>
+  </main>
+  <div class="footer">CREONOVA · доступ только для владельца · не передавай пароль администратора другим людям</div>
+</div>
+<script>
+(() => {
+  "use strict";
+  const API = "https://creonova-api.sportdenchik33.workers.dev";
+  let sessionToken = "";
+  let clients = [];
+  const $ = id => document.getElementById(id);
+
+  function showStatus(el, message, kind = "") {
+    el.textContent = message;
+    el.className = "status" + (kind ? " " + kind : "");
+    el.classList.remove("hidden");
+  }
+  function hideStatus(el) { el.classList.add("hidden"); }
+  async function api(path, options = {}) {
+    const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
+    if (sessionToken) headers.Authorization = "Bearer " + sessionToken;
+    const response = await fetch(API + path, { ...options, headers, cache: "no-store" });
+    let data = {};
+    try { data = await response.json(); } catch {}
+    if (!response.ok) throw new Error(data.error || "Ошибка сервера: " + response.status);
+    return data;
+  }
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, ch => ({
+      "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+    })[ch]);
+  }
+  function modeLabel(mode) {
+    return mode === "managed" ? "CREONOVA ведёт клиента" : "Клиент управляет сам";
+  }
+  function renderClients() {
+    $("totalCount").textContent = clients.length;
+    $("selfCount").textContent = clients.filter(c => c.service_mode !== "managed").length;
+    $("managedCount").textContent = clients.filter(c => c.service_mode === "managed").length;
+    const list = $("clientsList");
+    if (!clients.length) { list.innerHTML = '<div class="empty">Пока нет клиентов. Создай первого слева.</div>'; return; }
+    list.innerHTML = clients.map(c => `
+      <article class="client">
+        <div class="client-head">
+          <div><h3>${escapeHTML(c.name)}</h3><div class="slug">${escapeHTML(c.slug)}</div></div>
+          <span class="tag">${c.service_mode === "managed" ? "Под управлением" : "Самостоятельно"}</span>
+        </div>
+        <div class="meta">Бот: ${escapeHTML(c.bot_username || "не указан")}<br>Создан: ${escapeHTML(c.created_at || "дата не указана")}<br>${escapeHTML(c.notes || "")}</div>
+        <div class="actions">
+          <button class="secondary" type="button" data-copy="${escapeHTML(c.slug)}">Копировать slug</button>
+          <button class="danger" type="button" data-rotate="${escapeHTML(c.slug)}">Сменить ключ клиента</button>
+        </div>
+      </article>`).join("");
+    list.querySelectorAll("[data-copy]").forEach(btn => btn.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(btn.dataset.copy); showStatus($("globalStatus"), "Slug скопирован.", "good"); }
+      catch { showStatus($("globalStatus"), "Не удалось скопировать автоматически. Slug: " + btn.dataset.copy); }
+    }));
+    list.querySelectorAll("[data-rotate]").forEach(btn => btn.addEventListener("click", () => rotateToken(btn.dataset.rotate)));
+  }
+  async function loadClients() {
+    $("clientsList").innerHTML = '<div class="empty">Загружаем список…</div>';
+    try {
+      const data = await api("/api/admin/tenants", { method: "GET" });
+      clients = Array.isArray(data.tenants) ? data.tenants : [];
+      renderClients();
+      hideStatus($("globalStatus"));
+    } catch (error) {
+      showStatus($("globalStatus"), "Не удалось загрузить клиентов: " + error.message, "bad");
+      $("clientsList").innerHTML = '<div class="empty">Список не загружен.</div>';
+    }
+  }
+  $("loginForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    hideStatus($("loginStatus"));
+    const button = event.submitter;
+    if (button) button.disabled = true;
+    try {
+      const data = await fetch(API + "/api/login", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: $("password").value }), cache: "no-store"
+      }).then(async response => {
+        const json = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(json.error || "Ошибка входа");
+        return json;
+      });
+      sessionToken = data.token;
+      $("password").value = "";
+      $("loginPanel").classList.add("hidden");
+      $("app").classList.remove("hidden");
+      $("sessionBadge").textContent = "Авторизован";
+      await loadClients();
+    } catch (error) {
+      showStatus($("loginStatus"), "Войти не удалось: " + error.message, "bad");
+    } finally { if (button) button.disabled = false; }
+  });
+  $("createForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    hideStatus($("globalStatus"));
+    const payload = {
+      name: $("businessName").value.trim(),
+      slug: $("slug").value.trim(),
+      bot_username: $("botUsername").value.trim().replace(/^@/, ""),
+      service_mode: $("serviceMode").value,
+      notes: $("notes").value.trim()
+    };
+    try {
+      const result = await api("/api/admin/tenants", { method: "POST", body: JSON.stringify(payload) });
+      await loadClients();
+      $("createForm").reset();
+      const box = document.createElement("div");
+      box.className = "tokenbox";
+      const title = document.createElement("strong");
+      title.textContent = "КЛЮЧ СОЗДАН. СОХРАНИ ЕГО СЕЙЧАС — ПОТОМ ОН НЕ ПОКАЖЕТСЯ.";
+      const token = document.createElement("div");
+      token.className = "token";
+      token.textContent = result.admin_token || "";
+      const copy = document.createElement("button");
+      copy.type = "button"; copy.className = "secondary"; copy.textContent = "Скопировать ключ";
+      copy.addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(token.textContent); showStatus($("globalStatus"), "Ключ скопирован. Сохрани его в защищённом месте.", "good"); }
+        catch { showStatus($("globalStatus"), "Скопируй ключ вручную и сохрани в защищённом месте."); }
+      });
+      box.append(title, token, copy);
+      $("globalStatus").replaceChildren(box);
+      $("globalStatus").className = "status good";
+      $("globalStatus").classList.remove("hidden");
+    } catch (error) {
+      showStatus($("globalStatus"), "Не удалось создать клиента: " + error.message, "bad");
+    }
+  });
+  async function rotateToken(slug) {
+    if (!confirm("Сменить ключ для " + slug + "? Старый ключ перестанет работать.")) return;
+    try {
+      const result = await api("/api/admin/tenants/rotate-token", { method: "POST", body: JSON.stringify({ slug }) });
+      const box = document.createElement("div"); box.className = "tokenbox";
+      const title = document.createElement("strong"); title.textContent = "НОВЫЙ КЛЮЧ ДЛЯ " + slug + " — ПОКАЖЕТСЯ ТОЛЬКО СЕЙЧАС";
+      const token = document.createElement("div"); token.className = "token"; token.textContent = result.admin_token || "";
+      const copy = document.createElement("button"); copy.type = "button"; copy.className = "secondary"; copy.textContent = "Скопировать ключ";
+      copy.addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(token.textContent); showStatus($("globalStatus"), "Ключ скопирован.", "good"); }
+        catch { showStatus($("globalStatus"), "Скопируй ключ вручную."); }
+      });
+      box.append(title, token, copy);
+      $("globalStatus").replaceChildren(box); $("globalStatus").className = "status good"; $("globalStatus").classList.remove("hidden");
+    } catch (error) { showStatus($("globalStatus"), "Не удалось сменить ключ: " + error.message, "bad"); }
+  }
+  $("refreshBtn").addEventListener("click", loadClients);
+})();
+</script>
+</body>
+</html>
