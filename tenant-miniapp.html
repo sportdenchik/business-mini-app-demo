@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#10182b"><title>Бизнес-приложение</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0b1020;color:#f4f6ff;font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:760px;margin:auto;padding:22px 14px 50px}.top{padding:24px;border:1px solid #293655;border-radius:22px;background:linear-gradient(140deg,#202d50,#121b30)}
+.brand{font-size:12px;letter-spacing:.18em;color:#aebcff;font-weight:800}h1{font-size:clamp(27px,7vw,42px);line-height:1.1;margin:12px 0}p{color:#b6c2dc}.btn{background:#8d9cff;color:#0b1020;border:0;border-radius:11px;padding:12px 16px;font-weight:800;cursor:pointer}.ghost{background:#202d48;color:#edf1ff;border:1px solid #364767}.section{margin-top:16px;padding:20px;border:1px solid #293655;border-radius:18px;background:#121a2d}.section h2{margin:0 0 12px;font-size:20px}.item{padding:12px 0;border-top:1px solid #293655}.item:first-of-type{border-top:0}.muted{color:#8e9dbb;font-size:13px}.row{display:flex;gap:10px;flex-wrap:wrap}input,textarea,select{width:100%;padding:12px;border-radius:10px;border:1px solid #344361;background:#0b1223;color:#fff;font:inherit}label{display:block;margin:10px 0 6px;color:#c6d0e7}.hidden{display:none!important}.msg{white-space:pre-wrap;overflow-wrap:anywhere;background:#0b1223;border:1px solid #344361;border-radius:10px;padding:10px;margin:10px 0;color:#c6d0e7}
+</style></head>
+<body><main class="wrap">
+<header class="top"><div class="brand">CREONOVA MINI APP</div><h1 id="businessName">Загрузка…</h1><p id="description">Приложение бизнеса</p><div class="row"><button class="btn" id="adminOpen">Вход для владельца</button></div></header>
+<section class="section"><h2>Услуги</h2><div id="services" class="muted">Загружаем услуги…</div></section>
+<section class="section"><h2>Новости и предложения</h2><div id="news" class="muted">Загружаем новости…</div></section>
+<section id="admin" class="section hidden"><h2>Управление приложением</h2><p class="muted">Войди с ключом, выданным для этого клиента. Ключ не отправляй посторонним.</p>
+<div id="adminMsg" class="msg hidden"></div><label for="adminKey">Ключ доступа клиента</label><input id="adminKey" type="password" autocomplete="current-password">
+<div class="row" style="margin-top:10px"><button class="btn" id="loginBtn">Войти</button><button class="btn ghost" id="closeAdmin">Закрыть</button></div>
+<div id="editor" class="hidden"><label for="editName">Название бизнеса</label><input id="editName" maxlength="120"><label for="editDescription">Описание</label><textarea id="editDescription" rows="3"></textarea><label for="editServices">Услуги — по одной на строку</label><textarea id="editServices" rows="5" placeholder="Консультация&#10;Основная услуга"></textarea><label for="editNews">Новости и предложения — по одной на строку</label><textarea id="editNews" rows="5" placeholder="Новое предложение&#10;Новости компании"></textarea><button class="btn" id="saveBtn" style="margin-top:12px">Сохранить изменения</button></div>
+</section><p class="muted" style="text-align:center;margin-top:20px">Работает на платформе CREONOVA</p>
+</main>
+<script>
+(() => {
+ const API="https://creonova-api.sportdenchik33.workers.dev";
+ const params=new URLSearchParams(location.search); const slug=params.get("tenant")||"";
+ let session="", content={};
+ const $=id=>document.getElementById(id);
+ function msg(text, bad=false){$("adminMsg").textContent=text;$("adminMsg").classList.remove("hidden");$("adminMsg").style.color=bad?"#ffaaaa":"#bcebd2";}
+ async function call(path,options={}){const headers={"Content-Type":"application/json",...(options.headers||{})};if(session)headers.Authorization="Bearer "+session;const r=await fetch(API+path,{...options,headers,cache:"no-store"});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"Ошибка "+r.status);return d;}
+ function lines(value){if(Array.isArray(value))return value.map(x=>typeof x==="string"?x:(x.title||x.name||JSON.stringify(x)));if(typeof value==="string")return value.split(/\n/).map(s=>s.trim()).filter(Boolean);return [];}
+ function render(){const name=content.name||content.businessName||"Ваш бизнес";$("businessName").textContent=name;$("description").textContent=content.description||"Услуги, новости и предложения";
+  const services=lines(content.services);$("services").innerHTML=services.length?services.map(s=>'<div class="item">'+esc(s)+'</div>').join(""):'<div class="item muted">Информация об услугах скоро появится.</div>';
+  const news=lines(content.news||content.announcements);$("news").innerHTML=news.length?news.map(s=>'<div class="item">'+esc(s)+'</div>').join(""):'<div class="item muted">Пока нет новостей.</div>';
+ }
+ function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+ async function load(){if(!slug){$("businessName").textContent="Не указан клиент";$("description").textContent="В адресе приложения должен быть параметр ?tenant=slug.";return;}
+  try{const d=await call("/api/tenant/"+encodeURIComponent(slug)+"/content");content=d.content||{};render();}
+  catch(e){$("businessName").textContent="Не удалось загрузить приложение";$("description").textContent=e.message;}}
+ $("adminOpen").addEventListener("click",()=>$("admin").classList.toggle("hidden"));$("closeAdmin").addEventListener("click",()=>$("admin").classList.add("hidden"));
+ $("loginBtn").addEventListener("click",async()=>{try{const d=await call("/api/tenant/"+encodeURIComponent(slug)+"/login",{method:"POST",body:JSON.stringify({admin_token:$("adminKey").value})});session=d.token;$("editor").classList.remove("hidden");$("editName").value=content.name||content.businessName||"";$("editDescription").value=content.description||"";$("editServices").value=lines(content.services).join("\n");$("editNews").value=lines(content.news||content.announcements).join("\n");msg("Вход выполнен.");}catch(e){msg("Не удалось войти: "+e.message,true);}});
+ $("saveBtn").addEventListener("click",async()=>{try{const next={...content,name:$("editName").value.trim(),description:$("editDescription").value.trim(),services:$("editServices").value.split("\n").map(s=>s.trim()).filter(Boolean),news:$("editNews").value.split("\n").map(s=>s.trim()).filter(Boolean)};await call("/api/tenant/"+encodeURIComponent(slug)+"/content",{method:"PUT",body:JSON.stringify(next)});content=next;render();msg("Сохранено.");}catch(e){msg("Не удалось сохранить: "+e.message,true);}});
+ load();
+})();
+</script></body></html>
