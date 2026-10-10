@@ -113,12 +113,20 @@ button{border:0;border-radius:11px;padding:12px 16px;font:700 14px inherit;curso
         <div class="meta">Бот: ${escapeHTML(c.bot_username || "не указан")}<br>Создан: ${escapeHTML(c.created_at || "дата не указана")}<br>${escapeHTML(c.notes || "")}</div>
         <div class="actions">
           <button class="secondary" type="button" data-copy="${escapeHTML(c.slug)}">Копировать slug</button>
+          <button class="secondary" type="button" data-edit="${escapeHTML(c.slug)}">Редактировать</button>
+          <button class="secondary" type="button" data-link="${escapeHTML(c.slug)}">Ссылка приложения</button>
           <button class="danger" type="button" data-rotate="${escapeHTML(c.slug)}">Сменить ключ клиента</button>
         </div>
       </article>`).join("");
     list.querySelectorAll("[data-copy]").forEach(btn => btn.addEventListener("click", async () => {
       try { await navigator.clipboard.writeText(btn.dataset.copy); showStatus($("globalStatus"), "Slug скопирован.", "good"); }
       catch { showStatus($("globalStatus"), "Не удалось скопировать автоматически. Slug: " + btn.dataset.copy); }
+    }));
+    list.querySelectorAll("[data-edit]").forEach(btn => btn.addEventListener("click", () => editClient(btn.dataset.edit)));
+    list.querySelectorAll("[data-link]").forEach(btn => btn.addEventListener("click", async () => {
+      const link = location.origin + location.pathname.replace(/creonova-client-admin\\.html$/, "tenant-miniapp.html") + "?tenant=" + encodeURIComponent(btn.dataset.link);
+      try { await navigator.clipboard.writeText(link); showStatus($("globalStatus"), "Ссылка приложения скопирована: " + link, "good"); }
+      catch { showStatus($("globalStatus"), "Ссылка приложения: " + link); }
     }));
     list.querySelectorAll("[data-rotate]").forEach(btn => btn.addEventListener("click", () => rotateToken(btn.dataset.rotate)));
   }
@@ -193,6 +201,36 @@ button{border:0;border-radius:11px;padding:12px 16px;font:700 14px inherit;curso
       showStatus($("globalStatus"), "Не удалось создать клиента: " + error.message, "bad");
     }
   });
+  async function editClient(slug) {
+    const client = clients.find(item => item.slug === slug);
+    if (!client) return;
+    const name = prompt("Название бизнеса:", client.name || "");
+    if (name === null) return;
+    const botUsername = prompt("Username Telegram-бота (без @ или с @):", client.bot_username || "");
+    if (botUsername === null) return;
+    const serviceMode = prompt("Режим: self — клиент управляет сам; managed — ведёт CREONOVA.", client.service_mode || "self");
+    if (serviceMode === null) return;
+    if (!["self", "managed"].includes(serviceMode.trim())) {
+      showStatus($("globalStatus"), "Режим должен быть self или managed.", "bad"); return;
+    }
+    const notes = prompt("Заметки:", client.notes || "");
+    if (notes === null) return;
+    try {
+      await api("/api/admin/tenants/" + encodeURIComponent(slug), {
+        method: "PUT",
+        body: JSON.stringify({
+          name: name.trim(),
+          bot_username: botUsername.trim().replace(/^@/, ""),
+          service_mode: serviceMode.trim(),
+          notes: notes.trim()
+        })
+      });
+      await loadClients();
+      showStatus($("globalStatus"), "Данные клиента обновлены.", "good");
+    } catch (error) {
+      showStatus($("globalStatus"), "Не удалось обновить клиента: " + error.message, "bad");
+    }
+  }
   async function rotateToken(slug) {
     if (!confirm("Сменить ключ для " + slug + "? Старый ключ перестанет работать.")) return;
     try {
