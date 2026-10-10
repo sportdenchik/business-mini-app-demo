@@ -57,7 +57,7 @@
 <footer class="wrap footer"><span>© <span id="year"></span> CREONOVA. Цифровые решения для бизнеса.</span><span>Создано с вниманием к деталям.</span><span><a href="#home">Наверх ↑</a></span></footer>
 <button class="admin-fab" id="adminOpen" type="button">⚙ Управление витриной</button>
 <div class="modal" id="adminModal" role="dialog" aria-modal="true" aria-label="Управление витриной"><div class="modal-card"><div class="modal-head"><div><div class="kicker">LOCAL ADMIN</div><h2 style="margin:4px 0;font-size:24px">Управление витриной</h2></div><button class="close" id="adminClose">Закрыть ✕</button></div>
-<p class="note">Демонстрационная панель: данные сохраняются только в этом браузере. Она не защищена паролем и не подходит для секретных данных.</p>
+<p class="note">Изменения сохраняются в общей базе Cloudflare. При первом сохранении потребуется ADMIN_TOKEN из настроек Worker. Не передавайте токен посторонним.</p>
 <div class="field"><label for="brandTitle">Название</label><input id="brandTitle" value="CREONOVA"></div>
 <div class="field"><label for="heroTitle">Заголовок первого экрана</label><input id="heroTitle" value="Ваш бизнес. Новый уровень."></div>
 <div class="field"><label for="heroText">Описание первого экрана</label><textarea id="heroText">Создаём сайты, мини-приложения и AI-инструменты, которые помогают бизнесу выглядеть современно, быстрее работать и находить новых клиентов.</textarea></div>
@@ -71,7 +71,7 @@
 <div class="field"><label for="newsDescription">Текст публикации</label><textarea id="newsDescription" placeholder="Напишите текст новости или акции"></textarea></div>
 <button class="btn btn-main" id="saveNews">+ Опубликовать</button>
 <div class="admin-list" id="newsAdminList"></div>
-<p class="note">Публикации пока сохраняются только в этом браузере.</p></div>
+<p class="note">Публикации сохраняются вместе с остальными изменениями в общей базе.</p></div>
 
 <div style="border-top:1px solid var(--line);margin-top:22px;padding-top:18px"><div class="kicker">PORTFOLIO</div><h3 style="margin:4px 0 10px">Управление портфолио</h3>
 <div class="field"><label for="portfolioTitle">Название проекта</label><input id="portfolioTitle" placeholder="Например, Сайт для кофейни"></div>
@@ -80,7 +80,7 @@
 <div class="field"><label for="portfolioImage">Ссылка на изображение (необязательно)</label><input id="portfolioImage" placeholder="https://.../image.jpg"></div>
 <button class="btn btn-main" id="savePortfolio">+ Добавить проект</button>
 <div class="admin-list" id="portfolioAdminList"></div>
-<p class="note">Изображения и ссылки должны быть общедоступными. Проекты пока сохраняются только в этом браузере.</p></div>
+<p class="note">Изображения и ссылки должны быть общедоступными. Проекты сохраняются в общей базе.</p></div>
 
 <div class="field"><label for="serviceTitle">Название услуги</label><input id="serviceTitle" placeholder="Например, Сайт для бизнеса"></div>
 <div class="field"><label for="serviceDescription">Описание услуги</label><textarea id="serviceDescription" placeholder="Коротко опишите, что входит в услугу"></textarea></div>
@@ -175,7 +175,63 @@ function renderPortfolio(){
 
 function apply(){document.title=(state.brandTitle||'CREONOVA')+' — цифровые решения для бизнеса';document.querySelector('.brand span:nth-child(2)').textContent=state.brandTitle||'CREONOVA';const h=$('heroTitle').value||defaults.heroTitle;const parts=h.split('. ');document.querySelector('h1').innerHTML=parts.length>1?`${escapeHtml(parts[0])}.<br><span>${escapeHtml(parts.slice(1).join('. '))}</span>`:`<span>${escapeHtml(h)}</span>`;document.querySelector('.hero>div p').textContent=state.heroText||defaults.heroText;if(state.tgUrl&&/^https:\/\/t\.me\//i.test(state.tgUrl))$('tgLink').href=state.tgUrl;if(state.maxUrl&&/^https:\/\//i.test(state.maxUrl))$('maxLink').href=state.maxUrl}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function persist(){localStorage.setItem(KEY,JSON.stringify(state))}
+const API_URL='https://creonova-api.sportdenchik33.workers.dev';
+const TOKEN_KEY='creonova-admin-token-session';
+let serverReady=false;
+let cloudSaveTimer=null;
+
+async function saveToCloud(){
+  if(!serverReady) return;
+  let token=sessionStorage.getItem(TOKEN_KEY);
+  if(!token){
+    token=prompt('Введите ADMIN_TOKEN из настроек Cloudflare. Токен не сохраняется в коде сайта.');
+    if(!token) { toast('Сохранено только в этом браузере'); return; }
+    token=token.trim();
+    if(!token) { toast('Сохранено только в этом браузере'); return; }
+    sessionStorage.setItem(TOKEN_KEY,token);
+  }
+  try{
+    const response=await fetch(API_URL+'/api/content',{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({content:state})
+    });
+    if(response.status===401 || response.status===403){
+      sessionStorage.removeItem(TOKEN_KEY);
+      toast('Cloudflare не принял токен. Проверьте ADMIN_TOKEN');
+      return;
+    }
+    if(!response.ok) throw new Error('HTTP '+response.status);
+    toast('Изменения сохранены в общей базе');
+  }catch(error){
+    console.error('Cloud save failed:',error);
+    toast('Не удалось сохранить в облако — данные остались в браузере');
+  }
+}
+function persist(){
+  localStorage.setItem(KEY,JSON.stringify(state));
+  clearTimeout(cloudSaveTimer);
+  cloudSaveTimer=setTimeout(saveToCloud,350);
+}
+async function loadFromCloud(){
+  try{
+    const response=await fetch(API_URL+'/api/content',{method:'GET',cache:'no-store'});
+    if(!response.ok) throw new Error('HTTP '+response.status);
+    const data=await response.json();
+    const remote=data && data.content;
+    if(remote && typeof remote==='object' && Object.keys(remote).length){
+      state={...defaults,...remote};
+      localStorage.setItem(KEY,JSON.stringify(state));
+      fillForm();
+      apply();
+    }
+    serverReady=true;
+  }catch(error){
+    console.error('Cloud load failed:',error);
+    serverReady=true;
+    toast('Облако недоступно — пока используется этот браузер');
+  }
+}
 function fillForm(){ $('brandTitle').value=state.brandTitle;$('heroTitle').value=state.heroTitle;$('heroText').value=state.heroText;$('tgUrl').value=state.tgUrl;$('maxUrl').value=state.maxUrl;renderCustom();renderPortfolio();renderNews()}
 function openAdmin(){fillForm();$('adminModal').classList.add('open')}
 $('adminOpen').onclick=openAdmin;$('adminClose').onclick=()=>$('adminModal').classList.remove('open');$('adminModal').onclick=e=>{if(e.target===$('adminModal'))$('adminModal').classList.remove('open')};
@@ -212,6 +268,6 @@ $('saveService').onclick=()=>{
  $('serviceTitle').value='';$('serviceDescription').value='';$('servicePrice').value='';persist();renderCustom();
 };
 $('resetAdmin').onclick=()=>{if(!confirm('Сбросить локальные изменения?'))return;state={...defaults,customServices:[],portfolio:[],news:[]};persist();fillForm();apply();toast('Изменения сброшены')};
-$('year').textContent=new Date().getFullYear();fillForm();apply();
+$('year').textContent=new Date().getFullYear();fillForm();apply();loadFromCloud();
 </script>
 </body></html>
