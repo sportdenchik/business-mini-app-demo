@@ -218,7 +218,7 @@ async function loadFromCloud(){
     const response=await fetch(API_URL+'/api/content',{method:'GET',cache:'no-store'});
     if(!response.ok) throw new Error('HTTP '+response.status);
     const data=await response.json();
-    const remote=data && data.content;
+    const remote=data&&data.content&&(data.content.content||data.content);
     if(remote && typeof remote==='object' && Object.keys(remote).length){
       state={...defaults,...remote};
       localStorage.setItem(KEY,JSON.stringify(state));
