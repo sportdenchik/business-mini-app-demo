@@ -39,7 +39,7 @@ button{border:0;border-radius:11px;padding:12px 16px;font:700 14px inherit;curso
 
   <main id="app" class="hidden">
     <h1>Управление клиентами</h1>
-    <p class="intro">Создавай отдельные пространства для бизнеса, отслеживай способ обслуживания и выдавай клиенту его доступ. Данные клиентов разделяются по уникальному адресу.</p>
+    <p class="intro">Создавай отдельные пространства, выдавай доступ и безопасно подключай отдельного Telegram-бота каждому клиенту. Токен бота хранится на сервере в зашифрованном виде.</p>
     <div id="globalStatus" class="status hidden"></div>
     <div class="stats">
       <div class="stat"><b id="totalCount">0</b><span>Всего клиентов</span></div>
@@ -111,10 +111,9 @@ button{border:0;border-radius:11px;padding:12px 16px;font:700 14px inherit;curso
           <span class="tag">${c.service_mode === "managed" ? "Под управлением" : "Самостоятельно"}</span>
         </div>
         <div class="meta">Бот: ${escapeHTML(c.bot_username || "не указан")}<br>Создан: ${escapeHTML(c.created_at || "дата не указана")}<br>${escapeHTML(c.notes || "")}</div>
+        <div class="field" style="margin-top:12px"><label for="bot-token-${escapeHTML(c.slug)}">Токен бота клиента (получить у @BotFather)</label><input id="bot-token-${escapeHTML(c.slug)}" type="password" autocomplete="off" placeholder="Вставить токен сюда; он сохранится зашифрованным"><div class="note">Токен не показывается в списке и не возвращается из API.</div><button class="secondary" style="margin-top:8px" type="button" data-save-bot="${escapeHTML(c.slug)}">Подключить / обновить бота</button></div>
         <div class="actions">
           <button class="secondary" type="button" data-copy="${escapeHTML(c.slug)}">Копировать slug</button>
-          <button class="secondary" type="button" data-edit="${escapeHTML(c.slug)}">Редактировать</button>
-          <button class="secondary" type="button" data-link="${escapeHTML(c.slug)}">Ссылка приложения</button>
           <button class="danger" type="button" data-rotate="${escapeHTML(c.slug)}">Сменить ключ клиента</button>
         </div>
       </article>`).join("");
@@ -122,13 +121,21 @@ button{border:0;border-radius:11px;padding:12px 16px;font:700 14px inherit;curso
       try { await navigator.clipboard.writeText(btn.dataset.copy); showStatus($("globalStatus"), "Slug скопирован.", "good"); }
       catch { showStatus($("globalStatus"), "Не удалось скопировать автоматически. Slug: " + btn.dataset.copy); }
     }));
-    list.querySelectorAll("[data-edit]").forEach(btn => btn.addEventListener("click", () => editClient(btn.dataset.edit)));
-    list.querySelectorAll("[data-link]").forEach(btn => btn.addEventListener("click", async () => {
-      const link = "https://miniapp.creonova.ru/tenant-miniapp-telegram-sdk.html?tenant=" + encodeURIComponent(btn.dataset.link);
-      try { await navigator.clipboard.writeText(link); showStatus($("globalStatus"), "Ссылка приложения скопирована: " + link, "good"); }
-      catch { showStatus($("globalStatus"), "Ссылка приложения: " + link); }
-    }));
     list.querySelectorAll("[data-rotate]").forEach(btn => btn.addEventListener("click", () => rotateToken(btn.dataset.rotate)));
+    list.querySelectorAll("[data-save-bot]").forEach(btn => btn.addEventListener("click", async () => {
+      const slug = btn.dataset.saveBot;
+      const input = $("bot-token-" + slug);
+      const token = input.value.trim();
+      if (!token) { showStatus($("globalStatus"), "Вставь токен бота для " + slug + ".", "bad"); return; }
+      btn.disabled = true;
+      try {
+        const result = await api("/api/admin/tenants/telegram-bot", { method: "POST", body: JSON.stringify({ slug, bot_token: token }) });
+        input.value = "";
+        showStatus($("globalStatus"), "Бот @" + result.bot_username + " подключён к клиенту " + slug + ". Теперь настрой Main Mini App этого бота через @BotFather.", "good");
+        await loadClients();
+      } catch (error) { showStatus($("globalStatus"), "Не удалось подключить бота: " + error.message, "bad"); }
+      finally { btn.disabled = false; }
+    }));
   }
   async function loadClients() {
     $("clientsList").innerHTML = '<div class="empty">Загружаем список…</div>';
@@ -201,36 +208,6 @@ button{border:0;border-radius:11px;padding:12px 16px;font:700 14px inherit;curso
       showStatus($("globalStatus"), "Не удалось создать клиента: " + error.message, "bad");
     }
   });
-  async function editClient(slug) {
-    const client = clients.find(item => item.slug === slug);
-    if (!client) return;
-    const name = prompt("Название бизнеса:", client.name || "");
-    if (name === null) return;
-    const botUsername = prompt("Username Telegram-бота (без @ или с @):", client.bot_username || "");
-    if (botUsername === null) return;
-    const serviceMode = prompt("Режим: self — клиент управляет сам; managed — ведёт CREONOVA.", client.service_mode || "self");
-    if (serviceMode === null) return;
-    if (!["self", "managed"].includes(serviceMode.trim())) {
-      showStatus($("globalStatus"), "Режим должен быть self или managed.", "bad"); return;
-    }
-    const notes = prompt("Заметки:", client.notes || "");
-    if (notes === null) return;
-    try {
-      await api("/api/admin/tenants/" + encodeURIComponent(slug), {
-        method: "PUT",
-        body: JSON.stringify({
-          name: name.trim(),
-          bot_username: botUsername.trim().replace(/^@/, ""),
-          service_mode: serviceMode.trim(),
-          notes: notes.trim()
-        })
-      });
-      await loadClients();
-      showStatus($("globalStatus"), "Данные клиента обновлены.", "good");
-    } catch (error) {
-      showStatus($("globalStatus"), "Не удалось обновить клиента: " + error.message, "bad");
-    }
-  }
   async function rotateToken(slug) {
     if (!confirm("Сменить ключ для " + slug + "? Старый ключ перестанет работать.")) return;
     try {
