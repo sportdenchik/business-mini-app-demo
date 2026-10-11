@@ -124,7 +124,7 @@ button{border:0;border-radius:11px;padding:12px 16px;font:700 14px inherit;curso
     }));
     list.querySelectorAll("[data-edit]").forEach(btn => btn.addEventListener("click", () => editClient(btn.dataset.edit)));
     list.querySelectorAll("[data-link]").forEach(btn => btn.addEventListener("click", async () => {
-      const link = location.origin + location.pathname.replace(/creonova-client-admin\\.html$/, "tenant-miniapp.html") + "?tenant=" + encodeURIComponent(btn.dataset.link);
+      const link = "https://miniapp.creonova.ru/tenant-miniapp-telegram-sdk.html?tenant=" + encodeURIComponent(btn.dataset.link);
       try { await navigator.clipboard.writeText(link); showStatus($("globalStatus"), "Ссылка приложения скопирована: " + link, "good"); }
       catch { showStatus($("globalStatus"), "Ссылка приложения: " + link); }
     }));
