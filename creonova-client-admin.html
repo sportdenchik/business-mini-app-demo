@@ -15,7 +15,7 @@ label{display:block;font-size:13px;color:#c1cbe2;margin:0 0 7px}input,select,tex
 button{border:0;border-radius:11px;padding:12px 16px;font:700 14px inherit;cursor:pointer}.primary{background:linear-gradient(135deg,#9daaff,#7186ff);color:#0a1022}.secondary{background:#263451;color:#eaf0ff;border:1px solid #3b4b70}.danger{background:transparent;color:#ffb0b0;border:1px solid #74424c}.full{width:100%}.hidden{display:none!important}
 .note{color:var(--muted);font-size:12px;margin-top:9px}.status{padding:11px 13px;border-radius:10px;background:#0b1224;border:1px solid var(--line);color:var(--muted);margin:0 0 14px;white-space:pre-wrap;overflow-wrap:anywhere}.status.good{color:var(--good)}.status.bad{color:var(--bad)}
 .stats{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.stat{padding:12px 15px;background:#0b1224;border:1px solid var(--line);border-radius:13px;min-width:110px}.stat b{display:block;font-size:22px}.stat span{font-size:12px;color:var(--muted)}
-.client{border:1px solid var(--line);background:#0d1528;border-radius:14px;padding:15px;margin-top:11px}.client-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.client h3{margin:0;font-size:16px;overflow-wrap:anywhere}.slug{font:12px ui-monospace,monospace;color:#b7c4ff;margin-top:3px}.meta{font-size:12px;color:var(--muted);margin-top:10px}.tag{font-size:11px;border:1px solid #45577e;border-radius:999px;padding:4px 8px;color:#c8d3ff;white-space:nowrap}.tokenbox{margin-top:12px;border:1px solid #55755f;background:#10251e;border-radius:12px;padding:12px}.tokenbox strong{color:var(--good);font-size:12px}.token{overflow-wrap:anywhere;font:12px ui-monospace,monospace;margin:7px 0}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.actions button{font-size:12px;padding:8px 10px}.empty{color:var(--muted);text-align:center;padding:30px 12px}.footer{color:#697796;text-align:center;font-size:12px;margin-top:24px}
+.client{border:1px solid var(--line);background:#0d1528;border-radius:14px;padding:15px;margin-top:11px}.client-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.client h3{margin:0;font-size:16px;overflow-wrap:anywhere}.slug{font:12px ui-monospace,monospace;color:#b7c4ff;margin-top:3px}.meta{font-size:12px;color:var(--muted);margin-top:10px}.tag{font-size:11px;border:1px solid #45577e;border-radius:999px;padding:4px 8px;color:#c8d3ff;white-space:nowrap}.publishbox{margin-top:14px;border:1px solid #45577e;background:#111d34;border-radius:12px;padding:12px}.publishbox h4{margin:0 0 10px;font-size:14px}.publishbox textarea{min-height:78px}.tokenbox{margin-top:12px;border:1px solid #55755f;background:#10251e;border-radius:12px;padding:12px}.tokenbox strong{color:var(--good);font-size:12px}.token{overflow-wrap:anywhere;font:12px ui-monospace,monospace;margin:7px 0}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.actions button{font-size:12px;padding:8px 10px}.empty{color:var(--muted);text-align:center;padding:30px 12px}.footer{color:#697796;text-align:center;font-size:12px;margin-top:24px}
 @media(max-width:800px){.grid{grid-template-columns:1fr}.wrap{padding:20px 12px 40px}.panel{padding:17px}.top{align-items:flex-start}.two{grid-template-columns:1fr}}
 </style>
 </head>
@@ -112,6 +112,13 @@ button{border:0;border-radius:11px;padding:12px 16px;font:700 14px inherit;curso
         </div>
         <div class="meta">Бот: ${escapeHTML(c.bot_username || "не указан")}<br>Создан: ${escapeHTML(c.created_at || "дата не указана")}<br>${escapeHTML(c.notes || "")}</div>
         <div class="field" style="margin-top:12px"><label for="bot-token-${escapeHTML(c.slug)}">Токен бота клиента (получить у @BotFather)</label><input id="bot-token-${escapeHTML(c.slug)}" type="password" autocomplete="off" placeholder="Вставить токен сюда; он сохранится зашифрованным"><div class="note">Токен не показывается в списке и не возвращается из API.</div><button class="secondary" style="margin-top:8px" type="button" data-save-bot="${escapeHTML(c.slug)}">Подключить / обновить бота</button></div>
+        <div class="publishbox">
+          <h4>Публикация в Telegram-канал</h4>
+          <div class="field"><label for="publish-channel-${escapeHTML(c.slug)}">Канал клиента</label><input id="publish-channel-${escapeHTML(c.slug)}" value="${escapeHTML(c.channel_chat_id || '')}" placeholder="@username_канала"><div class="note">Бот ${c.bot_username ? '@'+escapeHTML(c.bot_username) : 'клиента'} должен быть администратором канала с правом публикации.</div></div>
+          <div class="field"><label for="publish-description-${escapeHTML(c.slug)}">Текст поста</label><textarea id="publish-description-${escapeHTML(c.slug)}" maxlength="700" placeholder="Напиши текст, который появится под названием бизнеса…"></textarea></div>
+          <button class="primary full" type="button" data-publish="${escapeHTML(c.slug)}" ${c.bot_username ? '' : 'disabled'}>Опубликовать пост с кнопкой «Открыть приложение»</button>
+          <div class="note">Публикация появится прямо в канале, под текстом будет URL-кнопка запуска мини-приложения.</div>
+        </div>
         <div class="actions">
           <button class="secondary" type="button" data-copy="${escapeHTML(c.slug)}">Копировать slug</button>
           <button class="danger" type="button" data-rotate="${escapeHTML(c.slug)}">Сменить ключ клиента</button>
@@ -135,6 +142,22 @@ button{border:0;border-radius:11px;padding:12px 16px;font:700 14px inherit;curso
         await loadClients();
       } catch (error) { showStatus($("globalStatus"), "Не удалось подключить бота: " + error.message, "bad"); }
       finally { btn.disabled = false; }
+    }));
+    list.querySelectorAll("[data-publish]").forEach(btn => btn.addEventListener("click", async () => {
+      const slug = btn.dataset.publish;
+      const channel = $("publish-channel-" + slug).value.trim();
+      const description = $("publish-description-" + slug).value.trim();
+      if (!channel) { showStatus($("globalStatus"), "Укажи канал для " + slug + ".", "bad"); return; }
+      if (!description) { showStatus($("globalStatus"), "Напиши текст поста для " + slug + ".", "bad"); return; }
+      if (!confirm("Опубликовать пост в канале " + channel + " от имени бота клиента " + slug + "?")) return;
+      btn.disabled = true;
+      const oldText = btn.textContent; btn.textContent = "Публикуем…";
+      try {
+        const result = await api("/api/admin/tenants/publish", { method: "POST", body: JSON.stringify({ slug, channel, description }) });
+        showStatus($("globalStatus"), "Пост опубликован в " + result.channel + ". Кнопка «Открыть приложение» добавлена. Ссылка запуска: " + result.app_link, "good");
+        await loadClients();
+      } catch (error) { showStatus($("globalStatus"), "Не удалось опубликовать пост: " + error.message, "bad"); }
+      finally { btn.disabled = false; btn.textContent = oldText; }
     }));
   }
   async function loadClients() {
