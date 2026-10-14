@@ -21,6 +21,30 @@ body{background:radial-gradient(ellipse at 12% -10%,#263b69 0,transparent 38%),r
 @media(max-width:760px){.wrap{padding:14px 12px 40px}.hero{padding:22px 20px;border-radius:21px}.layout{gap:12px}.sidebar{border-radius:16px;padding:7px}.nav{font-size:12px;gap:7px;padding:10px 8px}.nav span{width:22px;height:22px}.panel{padding:17px;border-radius:17px}.stats{gap:9px}.stat{padding:15px;min-height:92px}.stat b{font-size:25px}.hero .row{width:100%}.hero .row .btn{flex:1}}
 @media(max-width:400px){.wrap{padding-inline:9px}.sidebar{grid-template-columns:1fr 1fr}.nav{font-size:11px}.panel{padding:14px}.stats{grid-template-columns:1fr 1fr}}
 
+
+/* CREONOVA Telegram Mini App mobile layout fix: override desktop grid on narrow viewports */
+@media (max-width:760px){
+  html,body{width:100%;max-width:100%;overflow-x:hidden}
+  .wrap{width:100%;max-width:100%;min-width:0;padding:14px 12px 40px;margin:0}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr)!important;width:100%;min-width:0;gap:12px;margin-top:12px}
+  .sidebar,.main,.tab,.panel{width:100%;max-width:100%;min-width:0}
+  .sidebar{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));height:auto}
+  .nav{min-width:0;overflow-wrap:anywhere}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr));width:100%;min-width:0}
+  .stat{min-width:0;overflow-wrap:anywhere}
+  .hero{width:100%;min-width:0;padding:20px}
+  .hero>div{min-width:0;max-width:100%}
+  .hero .row{width:100%;min-width:0}
+  .hero .row .btn{flex:1 1 130px;min-width:0;white-space:normal}
+  .main>.msg{max-width:100%;overflow-wrap:anywhere}
+}
+@media (max-width:400px){
+  .wrap{padding-inline:9px}
+  .stats{grid-template-columns:minmax(0,1fr)}
+  .sidebar{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .nav{font-size:11px;padding:9px 7px}
+}
+
 </style><script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head><body><main class="wrap">
 <header class="hero"><div><div class="eyebrow">CREONOVA · ЛИЧНЫЙ КАБИНЕТ</div><h1 id="heroName">Кабинет бизнеса</h1><div class="muted" id="heroDesc">Управляйте услугами, новостями и оформлением приложения — всё в одном месте.</div></div><div class="row"><button class="btn" id="ownerLoginBtn">Вход для владельца</button><button class="btn secondary hidden" id="logoutBtn">Выйти</button></div></header>
