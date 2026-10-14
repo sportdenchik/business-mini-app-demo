@@ -46,6 +46,39 @@ body{background:radial-gradient(ellipse at 12% -10%,#263b69 0,transparent 38%),r
 }
 
 </style><script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style id="creonova-mobile-layout-hotfix">
+/* Mobile layout hotfix: override desktop grid rules declared later in the stylesheet. */
+html, body { width:100%; max-width:100%; overflow-x:hidden; }
+*, *::before, *::after { box-sizing:border-box; }
+.wrap { width:100%; min-width:0; max-width:1240px; }
+.main, .tab, .panel, .sidebar, .hero, .stats, .stat, .fieldgrid { min-width:0; max-width:100%; }
+@media (max-width: 760px) {
+  .wrap { width:100%; padding:12px 10px 36px !important; margin:0 auto; }
+  .layout { display:grid !important; grid-template-columns:minmax(0,1fr) !important; width:100% !important; min-width:0 !important; gap:12px !important; }
+  .sidebar { position:static !important; width:100% !important; min-width:0 !important; display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  .nav { min-width:0; overflow-wrap:anywhere; white-space:normal; }
+  .main { width:100% !important; min-width:0 !important; }
+  .tab, .tab > .panel, .main > .msg { width:100% !important; min-width:0 !important; }
+  .stats { width:100% !important; grid-template-columns:minmax(0,1fr) !important; gap:10px !important; }
+  .stat { width:100%; min-width:0; }
+  .hero { width:100%; padding:18px 15px !important; gap:12px; }
+  .hero > div { min-width:0; max-width:100%; }
+  .hero .row { width:100%; display:flex; flex-wrap:wrap; }
+  .hero .row .btn { flex:1 1 130px; min-width:0; }
+  .fieldgrid { width:100%; grid-template-columns:minmax(0,1fr) !important; }
+  .field, .field.full { width:100%; min-width:0; grid-column:1 / -1 !important; }
+  input, textarea, select { width:100%; max-width:100%; min-width:0; }
+  .between { align-items:flex-start; }
+  .itemcard { grid-template-columns:64px minmax(0,1fr) !important; min-width:0; }
+  .thumb { width:64px; height:64px; }
+}
+@media (max-width: 380px) {
+  .sidebar { grid-template-columns:minmax(0,1fr) !important; }
+  .nav { font-size:13px; }
+  .itemcard { grid-template-columns:minmax(0,1fr) !important; }
+}
+</style>
 </head><body><main class="wrap">
 <header class="hero"><div><div class="eyebrow">CREONOVA · ЛИЧНЫЙ КАБИНЕТ</div><h1 id="heroName">Кабинет бизнеса</h1><div class="muted" id="heroDesc">Управляйте услугами, новостями и оформлением приложения — всё в одном месте.</div></div><div class="row"><button class="btn" id="ownerLoginBtn">Вход для владельца</button><button class="btn secondary hidden" id="logoutBtn">Выйти</button></div></header>
 <section class="panel" id="publicStore"><h2>Услуги</h2><div id="publicServices" class="itemlist"><div class="empty">Загружаем услуги…</div></div></section><section class="panel" id="publicNews"><h2>Новости и предложения</h2><div id="publicNewsList" class="itemlist"><div class="empty">Загружаем публикации…</div></div></section><section class="panel" id="publicContacts"><h2>Связаться с нами</h2><div id="publicContactLinks" class="row"></div><div id="publicContactDetails" class="muted"></div></section>
