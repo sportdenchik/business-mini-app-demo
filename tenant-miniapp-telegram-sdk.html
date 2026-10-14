@@ -79,44 +79,9 @@ html, body { width:100%; max-width:100%; overflow-x:hidden; }
   .itemcard { grid-template-columns:minmax(0,1fr) !important; }
 }
 </style>
-
-<style id="creonova-telegram-viewport-fix">
-/* Telegram may expose a desktop-like CSS viewport inside a narrow Mini App.
-   Apply the compact layout based on Telegram WebApp detection, not only media queries. */
-html.creonova-in-telegram,
-html.creonova-in-telegram body { width:100% !important; max-width:100% !important; overflow-x:hidden !important; }
-html.creonova-in-telegram *, html.creonova-in-telegram *::before, html.creonova-in-telegram *::after { box-sizing:border-box; }
-html.creonova-in-telegram .wrap { width:100% !important; max-width:100% !important; min-width:0 !important; margin:0 !important; padding:12px 10px 32px !important; }
-html.creonova-in-telegram .hero { width:100% !important; min-width:0 !important; padding:16px 14px !important; gap:12px !important; }
-html.creonova-in-telegram .hero > div { min-width:0 !important; max-width:100% !important; }
-html.creonova-in-telegram .hero .row { display:flex !important; width:100% !important; min-width:0 !important; flex-wrap:wrap !important; }
-html.creonova-in-telegram .hero .row .btn { flex:1 1 120px !important; min-width:0 !important; white-space:normal !important; }
-html.creonova-in-telegram .layout { grid-template-columns:minmax(0,1fr) !important; width:100% !important; max-width:100% !important; min-width:0 !important; gap:10px !important; margin-top:12px !important; }
-html.creonova-in-telegram .sidebar { position:static !important; top:auto !important; width:100% !important; max-width:100% !important; min-width:0 !important; height:auto !important; display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:4px !important; padding:7px !important; }
-html.creonova-in-telegram .nav { width:100% !important; min-width:0 !important; margin:0 !important; padding:9px 7px !important; gap:7px !important; white-space:normal !important; overflow-wrap:anywhere !important; font-size:12px !important; }
-html.creonova-in-telegram .main,
-html.creonova-in-telegram .tab,
-html.creonova-in-telegram .tab > .panel,
-html.creonova-in-telegram .panel,
-html.creonova-in-telegram .msg,
-html.creonova-in-telegram .fieldgrid,
-html.creonova-in-telegram .field { width:100% !important; max-width:100% !important; min-width:0 !important; }
-html.creonova-in-telegram .stats { width:100% !important; min-width:0 !important; grid-template-columns:minmax(0,1fr) !important; gap:9px !important; }
-html.creonova-in-telegram .stat { width:100% !important; min-width:0 !important; overflow-wrap:anywhere !important; }
-html.creonova-in-telegram .fieldgrid { grid-template-columns:minmax(0,1fr) !important; gap:0 !important; }
-html.creonova-in-telegram .field,
-html.creonova-in-telegram .field.full { grid-column:1 / -1 !important; margin:10px 0 !important; }
-html.creonova-in-telegram input,
-html.creonova-in-telegram textarea,
-html.creonova-in-telegram select { display:block !important; width:100% !important; max-width:100% !important; min-width:0 !important; }
-html.creonova-in-telegram .itemcard { grid-template-columns:64px minmax(0,1fr) !important; width:100% !important; min-width:0 !important; }
-html.creonova-in-telegram .thumb { width:64px !important; height:64px !important; }
-html.creonova-in-telegram .between { align-items:flex-start !important; }
-@media (max-width:380px) {
-  html.creonova-in-telegram .sidebar { grid-template-columns:minmax(0,1fr) !important; }
-  html.creonova-in-telegram .itemcard { grid-template-columns:minmax(0,1fr) !important; }
-}
-</style>
+<!-- Avoid caching the admin UI in ordinary browser caches; API auth remains server-verified. -->
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
 </head><body><main class="wrap">
 <header class="hero"><div><div class="eyebrow">CREONOVA · ЛИЧНЫЙ КАБИНЕТ</div><h1 id="heroName">Кабинет бизнеса</h1><div class="muted" id="heroDesc">Управляйте услугами, новостями и оформлением приложения — всё в одном месте.</div></div><div class="row"><button class="btn" id="ownerLoginBtn">Вход для владельца</button><button class="btn secondary hidden" id="logoutBtn">Выйти</button></div></header>
 <section class="panel" id="publicStore"><h2>Услуги</h2><div id="publicServices" class="itemlist"><div class="empty">Загружаем услуги…</div></div></section><section class="panel" id="publicNews"><h2>Новости и предложения</h2><div id="publicNewsList" class="itemlist"><div class="empty">Загружаем публикации…</div></div></section><section class="panel" id="publicContacts"><h2>Связаться с нами</h2><div id="publicContactLinks" class="row"></div><div id="publicContactDetails" class="muted"></div></section>
@@ -133,7 +98,7 @@ html.creonova-in-telegram .between { align-items:flex-start !important; }
 <script>
 (()=>{'use strict';
 // Telegram Mini App initialization; normal browser use remains supported.
-try{const tg=window.Telegram&&window.Telegram.WebApp;if(tg){document.documentElement.classList.add('creonova-in-telegram');tg.ready();tg.expand();}}catch(e){console.warn('Telegram WebApp initialization skipped',e);}
+try{const tg=window.Telegram&&window.Telegram.WebApp;if(tg){tg.ready();tg.expand();}}catch(e){console.warn('Telegram WebApp initialization skipped',e);}
 const API='https://creonova-api.sportdenchik33.workers.dev';const params=new URLSearchParams(location.search);const slug=params.get('tenant')||'';let session='',content={},activeTab='dashboard',tenantMeta=null;const $=id=>document.getElementById(id);const defaults=()=>({services:[],news:[],contacts:{},theme:{accent:'#91a0ff'}});
 function escapeHTML(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}function arr(v){return Array.isArray(v)?v.map(x=>typeof x==='string'?{id:crypto.randomUUID(),title:x,description:'',price:'',image:''}:{id:x.id||crypto.randomUUID(),...x}):typeof v==='string'?v.split(/\n/).map(s=>s.trim()).filter(Boolean).map(title=>({id:crypto.randomUUID(),title,description:'',price:'',image:''})):[]}
 async function api(path,options={}){const headers={'Content-Type':'application/json',...(options.headers||{})};if(session)headers.Authorization='Bearer '+session;const r=await fetch(API+path,{...options,headers,cache:'no-store'});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||'Ошибка сервера '+r.status);return d;}
@@ -154,6 +119,12 @@ function editNews(id=''){const n=content.news.find(x=>x.id===id);$('newsId').val
 function compressImage(file,maxSide=700,quality=.62){return new Promise((resolve,reject)=>{if(!file)return resolve('');if(!file.type.startsWith('image/'))return reject(Error('Выберите файл изображения.'));const reader=new FileReader();reader.onerror=()=>reject(Error('Не удалось прочитать изображение.'));reader.onload=()=>{const im=new Image();im.onerror=()=>reject(Error('Файл изображения повреждён.'));im.onload=()=>{const scale=Math.min(1,maxSide/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.width*scale));c.height=Math.max(1,Math.round(im.height*scale));c.getContext('2d').drawImage(im,0,0,c.width,c.height);let data=c.toDataURL('image/jpeg',quality);if(data.length>52000){data=c.toDataURL('image/jpeg',.42)}if(data.length>65000)return reject(Error('Изображение всё ещё слишком большое. Выберите фотографию поменьше.'));resolve(data)};im.src=reader.result};reader.readAsDataURL(file)})}
 async function login(){if(!slug){showMsg('loginMsg','В ссылке отсутствует параметр tenant.',true);return}const btn=$('loginBtn');btn.disabled=true;try{const d=await api('/api/tenant/'+encodeURIComponent(slug)+'/login',{method:'POST',body:JSON.stringify({admin_token:$('adminKey').value})});session=d.token;const fetched=await api('/api/tenant/'+encodeURIComponent(slug)+'/content');content=fetched.content||{};normalize();try{tenantMeta=(await api('/api/tenant/'+encodeURIComponent(slug)+'/session')).tenant||null;}catch(e){tenantMeta=null;} $('loginPanel').classList.add('hidden');$('publicStore').classList.add('hidden');$('publicNews').classList.add('hidden');$('publicContacts').classList.add('hidden');$('appLayout').classList.remove('hidden');$('logoutBtn').classList.remove('hidden');fillProfile();renderLists();fillTelegramPanel();showMsg('globalMsg','Вход выполнен. Данные бизнеса загружены.');}catch(e){showMsg('loginMsg','Не удалось войти: '+e.message,true)}finally{btn.disabled=false}}
 function logout(){session='';content={};tenantMeta=null;$('adminKey').value='';$('appLayout').classList.add('hidden');$('publicStore').classList.remove('hidden');$('publicNews').classList.remove('hidden');$('publicContacts').classList.remove('hidden');$('loginPanel').classList.add('hidden');$('logoutBtn').classList.add('hidden');hideMsg('globalMsg')}
+// Telegram WebView can restore a previous page from its back-forward cache.
+// Never restore an already-open admin DOM without re-entering the client key.
+window.addEventListener('pageshow',function(event){if(event.persisted){logout();}});
+// Telegram may keep the WebView alive instead of firing pageshow on reopen.
+// Clear the in-memory admin session when the Mini App is sent to the background.
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden'&&session){logout();}});
 $('ownerLoginBtn').addEventListener('click',()=>{$('loginPanel').classList.toggle('hidden');if(!$('loginPanel').classList.contains('hidden'))$('adminKey').focus()});$('loginBtn').addEventListener('click',login);$('adminKey').addEventListener('keydown',e=>{if(e.key==='Enter')login()});$('logoutBtn').addEventListener('click',logout);document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.goto)));
 $('newServiceBtn').addEventListener('click',()=>editService());$('cancelServiceBtn').addEventListener('click',resetServiceForm);$('serviceList').addEventListener('click',async e=>{const edit=e.target.closest('[data-edit-service]'),del=e.target.closest('[data-delete-service]');if(edit)editService(edit.dataset.editService);if(del&&confirm('Удалить эту карточку услуги?')){content.services=content.services.filter(x=>x.id!==del.dataset.deleteService);if(await saveContent('Услуга удалена.'))renderLists()}});
 $('saveServiceBtn').addEventListener('click',async()=>{const title=$('serviceTitle').value.trim();if(!title){showMsg('globalMsg','Введите название услуги.',true);return}const btn=$('saveServiceBtn');btn.disabled=true;try{const id=$('serviceId').value||crypto.randomUUID(),old=content.services.find(x=>x.id===id);const file=$('serviceImage').files[0];const image=file?await compressImage(file):old?.image||'';const item={id,title,price:$('servicePrice').value.trim(),description:$('serviceDescription').value.trim(),image};const idx=content.services.findIndex(x=>x.id===id);if(idx>=0)content.services[idx]=item;else content.services.push(item);if(await saveContent('Карточка услуги сохранена.')){renderLists();resetServiceForm()}}catch(e){showMsg('globalMsg',e.message,true)}finally{btn.disabled=false}});
