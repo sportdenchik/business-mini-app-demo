@@ -79,6 +79,44 @@ html, body { width:100%; max-width:100%; overflow-x:hidden; }
   .itemcard { grid-template-columns:minmax(0,1fr) !important; }
 }
 </style>
+
+<style id="creonova-telegram-viewport-fix">
+/* Telegram may expose a desktop-like CSS viewport inside a narrow Mini App.
+   Apply the compact layout based on Telegram WebApp detection, not only media queries. */
+html.creonova-in-telegram,
+html.creonova-in-telegram body { width:100% !important; max-width:100% !important; overflow-x:hidden !important; }
+html.creonova-in-telegram *, html.creonova-in-telegram *::before, html.creonova-in-telegram *::after { box-sizing:border-box; }
+html.creonova-in-telegram .wrap { width:100% !important; max-width:100% !important; min-width:0 !important; margin:0 !important; padding:12px 10px 32px !important; }
+html.creonova-in-telegram .hero { width:100% !important; min-width:0 !important; padding:16px 14px !important; gap:12px !important; }
+html.creonova-in-telegram .hero > div { min-width:0 !important; max-width:100% !important; }
+html.creonova-in-telegram .hero .row { display:flex !important; width:100% !important; min-width:0 !important; flex-wrap:wrap !important; }
+html.creonova-in-telegram .hero .row .btn { flex:1 1 120px !important; min-width:0 !important; white-space:normal !important; }
+html.creonova-in-telegram .layout { grid-template-columns:minmax(0,1fr) !important; width:100% !important; max-width:100% !important; min-width:0 !important; gap:10px !important; margin-top:12px !important; }
+html.creonova-in-telegram .sidebar { position:static !important; top:auto !important; width:100% !important; max-width:100% !important; min-width:0 !important; height:auto !important; display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:4px !important; padding:7px !important; }
+html.creonova-in-telegram .nav { width:100% !important; min-width:0 !important; margin:0 !important; padding:9px 7px !important; gap:7px !important; white-space:normal !important; overflow-wrap:anywhere !important; font-size:12px !important; }
+html.creonova-in-telegram .main,
+html.creonova-in-telegram .tab,
+html.creonova-in-telegram .tab > .panel,
+html.creonova-in-telegram .panel,
+html.creonova-in-telegram .msg,
+html.creonova-in-telegram .fieldgrid,
+html.creonova-in-telegram .field { width:100% !important; max-width:100% !important; min-width:0 !important; }
+html.creonova-in-telegram .stats { width:100% !important; min-width:0 !important; grid-template-columns:minmax(0,1fr) !important; gap:9px !important; }
+html.creonova-in-telegram .stat { width:100% !important; min-width:0 !important; overflow-wrap:anywhere !important; }
+html.creonova-in-telegram .fieldgrid { grid-template-columns:minmax(0,1fr) !important; gap:0 !important; }
+html.creonova-in-telegram .field,
+html.creonova-in-telegram .field.full { grid-column:1 / -1 !important; margin:10px 0 !important; }
+html.creonova-in-telegram input,
+html.creonova-in-telegram textarea,
+html.creonova-in-telegram select { display:block !important; width:100% !important; max-width:100% !important; min-width:0 !important; }
+html.creonova-in-telegram .itemcard { grid-template-columns:64px minmax(0,1fr) !important; width:100% !important; min-width:0 !important; }
+html.creonova-in-telegram .thumb { width:64px !important; height:64px !important; }
+html.creonova-in-telegram .between { align-items:flex-start !important; }
+@media (max-width:380px) {
+  html.creonova-in-telegram .sidebar { grid-template-columns:minmax(0,1fr) !important; }
+  html.creonova-in-telegram .itemcard { grid-template-columns:minmax(0,1fr) !important; }
+}
+</style>
 </head><body><main class="wrap">
 <header class="hero"><div><div class="eyebrow">CREONOVA · ЛИЧНЫЙ КАБИНЕТ</div><h1 id="heroName">Кабинет бизнеса</h1><div class="muted" id="heroDesc">Управляйте услугами, новостями и оформлением приложения — всё в одном месте.</div></div><div class="row"><button class="btn" id="ownerLoginBtn">Вход для владельца</button><button class="btn secondary hidden" id="logoutBtn">Выйти</button></div></header>
 <section class="panel" id="publicStore"><h2>Услуги</h2><div id="publicServices" class="itemlist"><div class="empty">Загружаем услуги…</div></div></section><section class="panel" id="publicNews"><h2>Новости и предложения</h2><div id="publicNewsList" class="itemlist"><div class="empty">Загружаем публикации…</div></div></section><section class="panel" id="publicContacts"><h2>Связаться с нами</h2><div id="publicContactLinks" class="row"></div><div id="publicContactDetails" class="muted"></div></section>
@@ -95,7 +133,7 @@ html, body { width:100%; max-width:100%; overflow-x:hidden; }
 <script>
 (()=>{'use strict';
 // Telegram Mini App initialization; normal browser use remains supported.
-try{const tg=window.Telegram&&window.Telegram.WebApp;if(tg){tg.ready();tg.expand();}}catch(e){console.warn('Telegram WebApp initialization skipped',e);}
+try{const tg=window.Telegram&&window.Telegram.WebApp;if(tg){document.documentElement.classList.add('creonova-in-telegram');tg.ready();tg.expand();}}catch(e){console.warn('Telegram WebApp initialization skipped',e);}
 const API='https://creonova-api.sportdenchik33.workers.dev';const params=new URLSearchParams(location.search);const slug=params.get('tenant')||'';let session='',content={},activeTab='dashboard',tenantMeta=null;const $=id=>document.getElementById(id);const defaults=()=>({services:[],news:[],contacts:{},theme:{accent:'#91a0ff'}});
 function escapeHTML(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}function arr(v){return Array.isArray(v)?v.map(x=>typeof x==='string'?{id:crypto.randomUUID(),title:x,description:'',price:'',image:''}:{id:x.id||crypto.randomUUID(),...x}):typeof v==='string'?v.split(/\n/).map(s=>s.trim()).filter(Boolean).map(title=>({id:crypto.randomUUID(),title,description:'',price:'',image:''})):[]}
 async function api(path,options={}){const headers={'Content-Type':'application/json',...(options.headers||{})};if(session)headers.Authorization='Bearer '+session;const r=await fetch(API+path,{...options,headers,cache:'no-store'});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||'Ошибка сервера '+r.status);return d;}
